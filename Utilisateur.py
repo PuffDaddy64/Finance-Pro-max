@@ -1,3 +1,4 @@
+
 """
 Projet : Finances-Pro-Max
 Autheur : Thomas Raymond
@@ -6,94 +7,88 @@ Date : 13 avril 2026
 Description : Fonction qui ajoute des dépenses et des revenus
 
 """
-
+import array as arr
 import os
 import platform
 
 def validation_choix(choix): # Fonction à compléter
     return
 
-def validation_montant(montant):
-        while True:
-            try:
-                montant=float(montant[0])
-            except ValueError:
-                print("Veuillez entrer un nombre valide!")
-                return False
-            if montant<0:
-                print("Vous devez entrer un nombre positif!")
-                return False
-            else:
-                break
-        return True
 
-def ui_cleaner():
-		if(platform.system() != "Linux"):
-			os.system('cls')
-		else:
-			os.system('clear')
-
-
+def screen_clear():
+	if(platform.system() != "Linux"):
+		os.system('cls')
+	else:
+		os.system('clear')
 
 class Utilisateur:
-	_depense=[]
-	_revenu=[]
 
-	def get_depense(self):
-		depense_totale = 0
-		for depense in self._depense:
-			depense_totale += (depense)
-		return depense_totale
+	def __init__(self):
+		self.__depot = arr.array('f',{0})
+		self.__retrait = arr.array('f',{0})
+		self.transaction = arr.array('f',{0})
 
-	def set_depense(self, nouvelle_depense):
-        	if validation_montant(nouvelle_depense):
-           		self._depense.append(float(nouvelle_depense))
-       		else:
-           		print("Dépense non valide, veuillez réessayer.")
 
-	def get_revenu(self):
-		revenu_totale = 0 
-		for revenu in self._revenu: 
-			revenu_totale += (revenu)
-		return revenu_totale
-
-	def set_revenu(self, nouveau_revenu):
-		if validation_montant(nouveau_revenu):
-			self._revenu.append(float(nouveau_revenu))
+	def validation_montant(self,montant):
+		try:
+			montant=float(montant)
+		except ValueError:
+			print("Veuillez entrer un nombre valide!")
+			return False
+		if montant>0:
+                	return True
 		else:
-			print("Revenu non valide, veuillez réessayer.")
-	def get_solde(self):
-		return self.get_revenu() - self.get_depense()
-	
-	def ui_endle(self):
-		ui_cleaner()
-		print("Votre Solde Actuel : ",self.get_solde() )
-		print("Voulez-vous entrer une dépense ou un revenu? (d/r)\nQuitter: (q)")
-		choix = input("Entrez votre choix (d/r/q) : ")
-		return choix
+			print("Vous devez entrer un nombre positif!")
+		return False
 
-	def entree_utilisateur():
-		"""
-		Fonction qui gère l'entrée d'une dépense ou d'un revenu de l'utilisateur
 
-		Elle ne prend rien en entrée
+	def __set_depot(self,montant):
+		self.__depot.append(montant)
 
-		Elle retourne la dépense de l'utilisateur en cents
+	def __set_retrait(self,montant):
+		self.__retrait.append(montant)
 
-		"""
-		solde = 0
-		utilisateur=Utilisateur()
-		while(True):
-			choix = utilisateur.ui_endle()
-			if choix == "d":
-				utilisateur.set_depense(input("Entrez votre dépense en dollars CAD : ").replace(",","."))
+	def get_historique_depot(self):
+		return __depot
 
-			elif choix == "r":
-				utilisateur.set_revenu(input("Entrez votre revenu en dollars CAD : ").replace(",","."))
-			elif choix == "q":
-				ui_cleaner()
-				utilisateur.get_solde()
-				break
+	def set_transaction(self,montant,genre):
+		if self.validation_montant(montant):
+			transaction = float(montant)
+			if(genre == "d"):
+				self.__set_depot(transaction)
+			else:
+				transaction *= -1
+				self.__set_retrait(transaction)
+			self.transaction.append(transaction)
+		else:
+           		print("Transaction non valide, veuillez réessayer.")
+
+	def get_historique_retrait(self):
+		return self.__retrait
+
+	def get_transaction(self):
+		solde =0
+		for montant in self.transaction:
+			solde += montant
+		return solde
+
+	def __str__(self):
+		return f"Votre solde est de : {self.get_transaction()}$ \nVoulez-vous entrer une dépot ou un retrait? (d/r)\nQuitter: (q)"
+
 if __name__ == "__main__":
-	Utilisateur.entree_utilisateur()
+	solde = 0
+	utilisateur=Utilisateur()
+	while(True):
+		screen_clear()
+		print(utilisateur)
+		choix = input("Entrez votre choix (d/r/q) : ")
+		if choix == "d":
+			utilisateur.set_transaction(input("Entrez votre dépot en dollars CAD : ",).replace(",","."),choix)
+		elif choix == "r":
+			utilisateur.set_transaction(input("Entrez votre retrait en dollars CAD : ").replace(",","."),choix)
+		elif choix == "q":
+			screen_clear()
+			print("Votre solde est de : ",utilisateur.get_transaction(),"$")
+			break
 
+            
