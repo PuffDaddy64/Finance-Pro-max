@@ -59,7 +59,7 @@ class Transaction:
          return False
      
  
-     def set_transaction(self,montant,genre) -> None:
+     def set_transaction(self,montant,choix) -> None:
          if self.validation_montant(montant):
              transaction = float(montant) if choix == "d" else (float(montant)*-1)
              self.transaction.append(transaction)
