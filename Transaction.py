@@ -14,9 +14,10 @@ import array as arr
 import os
 import platform
 import time as t
+from typing import Any
 
- 
-def screen_clear():
+
+def screen_clear()->None:
      if(platform.system() != "Linux"):
          os.system('cls')
      else:
@@ -24,26 +25,26 @@ def screen_clear():
  
 class Transaction:
  
-     def __init__(self):
+     def __init__(self) -> None:
          self.transaction = arr.array('d')
 
-     def get_transaction(self):
+     def get_transaction(self) -> arr.array:
         return self.transaction
         
-     def get_solde(self):
+     def get_solde(self) -> float:
          solde = 0
          for montant in self.transaction:
              solde += montant
          return solde
 
-     def get_historique_depot(self):
+     def get_historique_depot(self)-> list[float]:
          return [montant for montant in self.get_transaction() if montant >= 0]
  
-     def get_historique_retrait(self):
+     def get_historique_retrait(self) -> list[float]:
          return  [montant for montant in self.get_transaction() if montant < 0]
  
  
-     def validation_montant(self,montant):
+     def validation_montant(self,montant) -> bool:
          try:
              montant=float(montant)
          except ValueError:
@@ -58,14 +59,14 @@ class Transaction:
          return False
      
  
-     def set_transaction(self,montant,genre):
+     def set_transaction(self,montant,genre) -> None:
          if self.validation_montant(montant):
              transaction = float(montant) if choix == "d" else (float(montant)*-1)
              self.transaction.append(transaction)
          else:
              print("Transaction non valide.")
              t.sleep(2)
-     def __str__(self):
+     def __str__(self) -> str:
         solde=self.get_solde()
         if solde < 0:
             return f"Votre solde est de : {"\033[91m"}{solde:.2f}{"\033[0m"}$ \nVoulez-vous entrer une dépot ou un retrait? (d/r)\nQuitter: (q)"
