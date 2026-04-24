@@ -56,19 +56,19 @@ def simple_ui()->None:
          #find if needed to be showned
          if len(liste_depot)!=0:
              if len(liste_depot)>past_lenght_liste_depot:
-                 historique_depot[liste_depot[len(liste_depot)-1]]=f"{t.localtime()[2]}/{t.localtime()[1]:02.0f}/{t.localtime()[0]:02.0f} à {t.localtime()[3]:02.0f}:{t.localtime()[4]:02.0f}:{t.localtime()[5]:02.0f}"
+                 historique_depot[f"{t.localtime()[2]}/{t.localtime()[1]:02.0f}/{t.localtime()[0]:02.0f} à {t.localtime()[3]:02.0f}:{t.localtime()[4]:02.0f}:{t.localtime()[5]:02.0f}"]=liste_depot[len(liste_depot)-1]
                  past_lenght_liste_depot+=1
              print("Historique des dépôts:")
              for element in historique_depot:
-                 print(f"{element:.2f}: {historique_depot[element]}")
+                 print(f"{element}: {historique_depot[element]:.2f}")
              print()
          if len(liste_retrait)!=0:
              if len(liste_retrait)>past_lenght_liste_retrait:
-                 historique_retrait[liste_retrait[len(liste_retrait)-1]]=f"{t.localtime()[2]}/{t.localtime()[1]:02.0f}/{t.localtime()[0]:02.0f} à {t.localtime()[3]:02.0f}:{t.localtime()[4]:02.0f}:{t.localtime()[5]:02.0f}"
+                 historique_retrait[f"{t.localtime()[2]}/{t.localtime()[1]:02.0f}/{t.localtime()[0]:02.0f} à {t.localtime()[3]:02.0f}:{t.localtime()[4]:02.0f}:{t.localtime()[5]:02.0f}"]=liste_retrait[len(liste_retrait)-1]
                  past_lenght_liste_retrait+=1
              print("Historique des retraits:")
              for element in historique_retrait:
-                 print(f"{element:.2f}: {historique_retrait[element]}")
+                 print(f"{element}: {historique_retrait[element]:.2f}")
              print()
          #display the solde
          print(transaction)
