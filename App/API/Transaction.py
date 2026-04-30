@@ -6,7 +6,7 @@
  Name Of File : Transaction.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 21 avril 2026
+ Date : 29 avril 2026
  
 Description  : Class for the transaction handling with deposit and withdrew
                 The Class is call from the frontend (UI) for displaying info
@@ -21,6 +21,10 @@ class Transaction:
     """
     Method that is call a constructor and initialize value for the object first 
     """ 
+
+    def information_format(self): # À voir si je l'ai mis à la bonne place
+         return "B B H B B B d" # B = 1 byte unsigned ; H = 2 bytes unsigned ; d = double float signed
+
     def __init__(self) -> None:
          self.transaction = arr.array('d')
 
