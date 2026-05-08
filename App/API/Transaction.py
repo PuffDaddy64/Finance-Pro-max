@@ -1,4 +1,3 @@
-
  
 """
  Projet : Finances-Pro-Max
@@ -6,10 +5,11 @@
  Name Of File : Transaction.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 5 mai 2026
+ Date : 29 avril 2026
  
 Description  : Class for the transaction handling with deposit and withdrew
-                The Class is call from the frontend (UI) for displaying info.
+                The Class is call from the frontend (UI) for displaying info
+                and saving them
 """
 import array as arr
 import time as t
@@ -17,25 +17,18 @@ from typing import Any
 
  
 class Transaction:
+    """
+    Method that is call a constructor and initialize value for the object first 
+    """ 
 
-    def __init__(self) -> None:
-         """
-         Method that is call a constructor and initialize value for the object first 
-         """ 
-         self.transaction = arr.array('d')
-
-    def information_format(self): 
-         return "B B H B B B d" # B = 1 byte unsigned ; H = 2 bytes unsigned ; d = double float signed (4 bytes). So 7 bytes total
-
-    def get_transaction(self) -> arr.array:
-        return self.transaction
-
-    def get_solde(self) -> float:
-         solde = 0
-         for montant in self.transaction:
-             solde += montant
-         return solde
-
+    def __init__(self,montant,choix,date) -> None:
+         self.montant = 0
+         self.set_montant(montant,choix) 
+         self.date = date
+ 
+    def get_date(self):
+        return self.date
+ 
     """
      Valid the new montant before its added to the array of transaction
     """
@@ -53,14 +46,17 @@ class Transaction:
              t.sleep(1)
          return False
 
-    def set_transaction(self,montant,choix) -> None:
+    def set_montant(self,montant,choix) -> Transaction:
          if self.validation_montant(montant):
-             transaction = float(montant) if choix == "d" else (float(montant)*-1)
-             self.transaction.append(transaction)
+             self.montant : float  = float(montant) if choix == "d" else (float(montant)*-1)
+             return self
          else:
              print("Transaction non valide.")
              t.sleep(2)
 
+
+    def get_montant(self):
+        return self.montant
     """
     Method that get call when the object is parameter of a print() so the look of an opbject
     """
