@@ -24,7 +24,7 @@ class User:
     if(platform.system() == "Windows"):
         __PATH = str(PureWindowsPath(__file__).parent)+'\\'+'.memory'+'\\'
     else:
-        __PATH = '../'+'.memory'+'/'
+        __PATH = 'App/'+'.memory'+'/'
 
 
     
@@ -50,11 +50,14 @@ class User:
     def retreive_info(self,name,path) -> None:
         transactions = []
         try:
-            transaction = pickle.loads(fichier.read_content(path))
+            memory_content=fichier.read_content(path) 
+            transaction = pickle.loads(memory_content)
         except EOFError as e :
-            transaction = [Transaction(0,"d",0)]
+            transaction = [Transaction("I","d",0)]
         except TypeError as e:
-            transaction = [Transaction(0,"d",0)]
+            transaction = [Transaction("I","d",0)]
+        
+        
         return transaction
 
     def save_info(self)->None:
@@ -77,7 +80,8 @@ class User:
         self.path = Path(self.__class__.__PATH + name + '.bin')
         self.name = name
         self.solde = self.retreive_info(name, self.path)
-
+        
+            
     def print_historic(self)->str:
         historic_widget :str = ""
         if(len(self.solde) > 1 ):

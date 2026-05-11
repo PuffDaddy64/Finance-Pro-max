@@ -39,19 +39,11 @@ def read_content(file_name):
     except FileNotFoundError as e:
         print(f"File dont exist do you want to create one whit this Username?(Y,N) : ")
         aws = input()
-        if(aws.lower() == "y"):
+        if(aws== "y"):
             write_object_binary(file_name,None)
             return read_content()
+        else:
+            return None
     except IOError as e: 
         print(f"An error occure when reading the files: {e}")
 
-#     
-# def store_transaction_information(liste_pour_binaire, transaction_type):
-#     # Store time informations
-#     moment=t.localtime()
-#     day, month, year, hour, minute, second, money = moment[2], moment[1], moment[0], moment[3], moment[4], moment[5], struct.unpack(Transaction().information_format(), liste_pour_binaire[len(liste_pour_binaire)-1])
-#                 
-#     if transaction_type=="depot":
-#         User().set_depot_historic(day, month, year, hour, minute, second, money)
-#     else:
-#         User().set_retrait_historic(day, month, year, hour, minute, second, money)

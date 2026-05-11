@@ -46,7 +46,9 @@ class Transaction:
              t.sleep(1)
          return False
 
-    def set_montant(self,montant,choix) -> Transaction:
+    def set_montant(self,montant,choix) -> Transaction:         
+         if montant == "I":
+            return 0
          if self.validation_montant(montant):
              self.montant : float  = float(montant) if choix == "d" else (float(montant)*-1)
              return self

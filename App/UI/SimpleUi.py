@@ -43,13 +43,13 @@ Basic configuration for endeling display. So a simple Textbase User Interface(TU
     
     
 def simple_ui()->None:
-    screen_clear()
     # Initialize classes
 #    transaction=Transaction()
+    screen_clear()
     user=User(input("What is your username : "))
-
     # Main loop that display the app
     while(True):
+         #clean the screen
          #clean the screen
          screen_clear()
 
