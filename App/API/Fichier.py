@@ -1,8 +1,18 @@
+"""
+ Projet : Finances-Pro-Max
+ Directory : API
+ Name Of File : Fichier.py
+ Author : Thomas Raymond
+ Author : Félix Roussin 
+ Date : 15 mai 2026
+
+Description : Program hgandling the files.
+"""
 
 from io import BufferedWriter, FileIO, BufferedReader
 import pickle
 import platform
-from pathlib import Path
+from pathlib import PureWindowsPath, Path # Il manquait PureWindowsPath
 
 
 if(platform.system() == "Windows"):
