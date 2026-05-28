@@ -18,36 +18,16 @@ import pickle
 import datetime
 from pathlib import Path, PureWindowsPath
 import os
+import hashlib
 
 
 def prRed(s): return "\033[91m {}\033[00m".format(s)
 def prGreen(s): return "\033[92m {}\033[00m".format(s)
  
 class User:
-
-
-    
-    # def extract_memory_file_information(self, file_name):
-    #  """
-    #  Function to read a memory file. It takes the file name as an input and outputs the bytes in a list of one element(the line)
-    #  """
-     # 
-     # try:
-     #    memory_file=open(file_name,"xb") # Try opening the file if it doesn't exist
-     #    liste_pour_binaire=[]
-     # except FileExistsError:
-     #    memory_file=open(file_name,"rb")
-     #    liste_pour_binaire=[]
-     #    contenu=memory_file.readline() # Read the information
-     #    liste_pour_binaire.append(contenu) # Store it
-     # memory_file.close()
-     # return liste_pour_binaire
-
-        
-
     
     def retreive_info(self,name):
-        transactions = []
+        transactions = None
         try:
             memory_content=fichier.read_content(name) 
             transaction = pickle.loads(memory_content)
@@ -59,8 +39,12 @@ class User:
         
         return transaction
 
+    def get_hash( self, psw : str ):
+        hash_obj = hashlib.sha256((self.name+psw).encode())
+        return hash_obj.hexdigest()
+
     def save_info(self)->None:
-        fichier.write_object_binary(self.name,self.solde)
+        fichier.write_object_binary(self.key,self.solde)
 
     def add_transaction(self,montant,choix)->None:
         now = datetime.datetime.now()
@@ -75,13 +59,17 @@ class User:
     def get_solde(self):
         return self.solde
 
-    def __init__(self,name:str)->None:
+
+
+    def __init__(self,name:str,pwd: str)->None:
         self.name = name
-        historic = self.retreive_info(name)
-        if(historic!=None):       
+        self.key = self.get_hash(pwd)
+        historic = self.retreive_info(self.key)
+        if(historic!=None):   
             self.solde = historic
         else:
             self.solde = []
+            return None
 
         
             

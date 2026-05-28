@@ -22,6 +22,46 @@ import API.Fichier as fichier
 import os
 import platform
 import struct
+from getpass import getpass
+import hashlib
+
+
+
+
+animation = [
+"[        ]",
+"[=       ]",
+"[===     ]",
+"[====    ]",
+"[=====   ]",
+"[======  ]",
+"[======= ]",
+"[========]",
+"[ =======]",
+"[  ======]",
+"[   =====]",
+"[    ====]",
+"[     ===]",
+"[      ==]",
+"[       =]",
+"[        ]",
+"[        ]"
+]
+
+
+
+def wait(second : int): 
+    i = 0 
+    while True:
+        print(animation[i % len(animation)], end='\r')
+        t.sleep(.1)
+        i += 1
+        if(i>second*17):
+            break
+
+
+
+
 
 """
 Method that cleans the screen using command prompt
@@ -43,20 +83,25 @@ def choice_is_due() -> str:
 Basic configuration for endeling display. So a simple Textbase User Interface(TUI)0
 """
 
-def open_session(name):
-    content : bool = fichier.file_exist(name)
-    if(content):
+def open_session(name,pwd):
+    if(User(name,pwd).get_solde()!=[]):
+        screen_clear()
+        print("Log in .")
+        wait(1)
         return True
     else:
         print(f"File dont exist do you want to create one whit this Username?(Y,N) : ")
         choice = input()
         if( choice == "y" or choice ==  "Y"):
-            fichier.write_object_binary(name,None)
+            screen_clear()
+            print(f"Creating the account")
+            wait(1)
+            User(name,pwd)
             return True
         else:
             screen_clear()
             print("Back to log in then.")
-            t.sleep(1)
+            wait(1)
             return False 
             
 
@@ -66,9 +111,21 @@ def simple_ui()->None:
     # Initialize classes
     while(True):
         screen_clear()
-        name :str = input("What is your username : ")
-        if(open_session(name)):
-            user=User(name)
+        while True:
+            name :str = input("What is your username : ")
+            if(len(name)>0):
+                break
+            else:
+                print(f"Need more than one digit.")
+
+        while True:        
+            pwd : str = getpass("Password : ")
+            if(len(pwd)>0):
+                break
+            else:
+                print(f"Need more than one digit.")
+        if(open_session(name,pwd)):
+            user=User(name,pwd)
             break
 
     # Main loop that display the app
@@ -98,6 +155,6 @@ def simple_ui()->None:
          #Error if the letter is not take in charge
          else:
              print("Non Valide.")
-             t.sleep(1)
+             wait(1)
 
 

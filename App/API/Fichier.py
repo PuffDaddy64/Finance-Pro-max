@@ -18,7 +18,7 @@ from pathlib import PureWindowsPath, Path # Il manquait PureWindowsPath
 if(platform.system() == "Windows"):
     __PATH = str(PureWindowsPath(__file__).parent)+'\\'+'.memory'+'\\'
 else:
-    __PATH = 'App/'+'.memory'+'/'
+    __PATH = '.memory'+'/'
 
 
 """
@@ -68,7 +68,7 @@ def read_content(file_name):
             content = BufferedReader(file_content)
             return content.read()
     except FileNotFoundError as e:
-        print(f"File dont exist so an error occure : {e}")
+        print(f"Can't resolve this username and this password" )
     except IOError as e: 
         print(f"An error occure when reading the files: {e}")
 
