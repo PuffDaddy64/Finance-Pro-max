@@ -4,7 +4,7 @@
  Name Of File : SimpleUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 5 mai 2026
+ Date : 6 juin 2026
 
 Description : Simple TUI Handler nothing crazy just the base. Also, there is actually a memory mangement here, but it should be moved
 at another place.
@@ -119,7 +119,7 @@ def simple_ui()->None:
                 print(f"Need more than one digit.")
 
         while True:        
-            pwd : str = getpass("Password : ")
+            pwd : str = getpass("Password : ", echo_char="*")
             if(len(pwd)>0):
                 break
             else:
