@@ -79,13 +79,13 @@ class User:
             historic_widget += "Votre historique : \n"
             depot = self.get_depot()
             if(len(depot)!=0):
-                historic_widget += "Vos depot: \n"
+                historic_widget += "Vos dépots: \n"
                 for i in depot:
                     historic_widget += prGreen(f"{i.get_montant():.2f}$, {i.get_date()}") # .2f permet d'écrire deux chiffres après la virgule
                     historic_widget += "\n"
             retrait = self.get_retrait()
             if(len(retrait)!=0):
-                historic_widget += "Vos retrait: \n"
+                historic_widget += "Vos retraits: \n"
                 for i in retrait:
                     historic_widget += prRed(f"{i.get_montant():.2f}$, {i.get_date()}")
                     historic_widget += "\n"
