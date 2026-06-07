@@ -4,9 +4,9 @@
  Name Of File : Fichier.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 15 mai 2026
+ Date : 6 juin 2026
 
-Description : Program hgandling the files.
+Description : Program handling the files.
 """
 
 from io import BufferedWriter, FileIO, BufferedReader
@@ -43,7 +43,7 @@ def write_object_binary(file_name,data)-> None:
 """    
 def add_object_binary(file_name,data)-> None:
      try:
-        with BufferedWritter(FileIO((__PATH+file_name+'.bin'),"wb")) as writter:
+        with BufferedWriter(FileIO((__PATH+file_name+'.bin'),"wb")) as writer:
             pickle.dump(data, writer)
      except IOError as e: 
         print(f"An error occure when wrinting the files")
@@ -60,7 +60,7 @@ def file_exist(file_name) -> bool :
     return True
 
 """
-    Read the files that got passe as argument and return the content
+    Read the files that got passed as an argument and return the content
 """
 def read_content(file_name):
     try:
@@ -70,5 +70,5 @@ def read_content(file_name):
     except FileNotFoundError as e:
         print(f"Can't resolve this username and this password" )
     except IOError as e: 
-        print(f"An error occure when reading the files: {e}")
+        print(f"An error occured when reading the files: {e}")
 

@@ -79,7 +79,7 @@ class User:
             historic_widget += "Votre historique : \n"
             depot = self.get_depot()
             if(len(depot)!=0):
-                historic_widget += "Vos dépots: \n"
+                historic_widget += "Vos dépôts: \n"
                 for i in depot:
                     historic_widget += prGreen(f"{i.get_montant():.2f}$, {i.get_date()}") # .2f permet d'écrire deux chiffres après la virgule
                     historic_widget += "\n"
