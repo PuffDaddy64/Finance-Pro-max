@@ -4,7 +4,7 @@
  Name Of File : SimpleUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 6 juin 2026
+ Date : 12 juin 2026
 
 Description : Simple TUI Handler nothing crazy just the base. Also, there is actually a memory mangement here, but it should be moved
 at another place.
@@ -28,8 +28,10 @@ import pickle
 from io import BufferedWriter, FileIO, BufferedReader
 
 nom="" # Initializing username's variable for all functions
-names=[] # Initializing the container for all names existant in te system
-info=None # Initializing the variable that'll be used for containing variables information
+users=[] # Initializing the container for all names existant in te system
+names=[] # List of usernames
+info_users=None # Initializing the variable that'll be used for containing users complete connexion information
+info_names=None # Initializing the variable that'll be used for containing username information
 
 animation = [
 "[        ]",
@@ -87,8 +89,8 @@ Basic configuration for endeling display. So a simple Textbase User Interface(TU
 """
 
 def open_session(name,pwd):
-    global names
-    if(User(name,pwd).get_solde()!=[]):
+    global users, names
+    if name+pwd in users:
         screen_clear()
         print("Log in .")
         wait(1)
@@ -98,36 +100,47 @@ def open_session(name,pwd):
          wait(1)
          return False
     else:
-        print(f"Account doesn't exist. Do you want to create it with this Username?(Y,N) : ")
-        choice = input()
-        if( choice == "y" or choice ==  "Y"):
-            screen_clear()
-            print(f"Creating the account")
-            wait(1)
-            User(name,pwd)
-            fichier.add_object_binary("all_names_file", name)
-            return True
-        else:
-            screen_clear()
-            print("Back to log in then.")
-            wait(1)
-            return False 
+        while True:
+            print(f"Voulez-vous créer ce compte avec ce mot de passe et ce nom d'utilisateur?(Y,N) : ")
+            choice = input()
+            if choice.lower() == "y":
+                screen_clear()
+                print(f"Création du compte")
+                wait(1)
+                User(name,pwd)
+                fichier.add_object_binary("users_list", name+pwd)
+                fichier.add_object_binary("names", name)
+                return True
+            elif choice.lower()=="n":
+                screen_clear()
+                print("Retour à la connexion.")
+                wait(1)
+                return False 
+            else:
+                screen_clear()
+                print("Votre réponse doit être oui(y) ou non(n).")
+                print(f"Votre choix: «{choice}» n'est pas valide.")
+                wait(1)
+                screen_clear()
+                continue
             
 def get_username():
-    global names, info, nom
+
+    global users, info_users, nom
+
     # Initialize classes
     while(True):
         while True:
             screen_clear()
             print("Bienvenue sur Finance Pro Max!")
-            name :str = input("What is your username : ")
+            name :str = input("Quel est votre nom d'utilisateur : ")
             nom=name
             if(len(nom)>0):
-                if nom in names:
+                if nom in users:
                     screen_clear()
-                    print("Utilisateur existant")
-                    print("Vous aurez trois tentatives pour le mot de passe")
-                    wait(2)
+                    print("Utilisateur existant.")
+                    print("Vous aurez trois tentatives pour le mot de passe.")
+                    wait(1)
                     return nom
                 else:
                     return nom
@@ -138,8 +151,8 @@ def get_password(nom):
     while True:        
             screen_clear()
             print("Bienvenue sur Finance Pro Max!")
-            print(f"Username: {nom}")
-            pwd : str = getpass("Password : ", echo_char="*")
+            print(f"Nom d'utilisateur: {nom}")
+            pwd : str = getpass("Mot de passe : ", echo_char="*")
             password=str(pwd)
             if(len(pwd)>0):
                 return password
@@ -147,12 +160,24 @@ def get_password(nom):
                 continue
     
 def simple_ui()->None:
-    global names, info
-    info=fichier.read_content("all_names_file")
-    if info==None:
+    # Calling global variables useful in the function
+    global users, names, info_users, info_names
+
+    # Reading users et usernames files to be able to verify in the inputs corresponds to an exxisting user
+    info_users=fichier.read_content("users_list")
+    info_names=fichier.read_content("names")
+
+    # Decode binary information and set variables
+    if info_users==None:
+        users=[]
+    else:
+        users.append(pickle.loads(info_users))
+
+    if info_names==None:
         names=[]
     else:
-        names.append(pickle.loads(info))
+        names.append(pickle.loads(info_names))
+
     tentatives_password=0
     while True:
         name=get_username()

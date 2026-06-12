@@ -4,7 +4,7 @@
  Name Of File : Fichier.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 6 juin 2026
+ Date : 12 juin 2026
 
 Description : Program handling the files.
 """
@@ -68,7 +68,7 @@ def read_content(file_name):
             content = BufferedReader(file_content)
             return content.read()
     except FileNotFoundError as e:
-        print(f"Can't resolve this username and this password" )
+        print(f"Le mot de passe entré ne correspond à aucun utilisateur." )
     except IOError as e: 
         print(f"An error occured when reading the files: {e}")
 

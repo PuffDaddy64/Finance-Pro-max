@@ -15,7 +15,3 @@ import UI.SimpleUi as Sui
 
 if __name__ == "__main__":
     Sui.simple_ui()
-    
-
-
-
