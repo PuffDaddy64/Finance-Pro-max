@@ -71,4 +71,3 @@ def read_content(file_name):
         print(f"Le mot de passe entré ne correspond à aucun utilisateur." )
     except IOError as e: 
         print(f"An error occured when reading the files: {e}")
-

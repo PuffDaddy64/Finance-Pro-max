@@ -4,9 +4,9 @@
  Name Of File : SimpleUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 12 juin 2026
+ Date : 7 août 2026
 
-Description : Simple TUI Handler nothing crazy just the base. Also, there is actually a memory mangement here, but it should be moved
+Description : Simple TUI Handler, nothing crazy just the base. Also, there is actually a memory management here, but it should be moved
 at another place.
 
 """
@@ -15,17 +15,15 @@ at another place.
 """
 Use to acces the class of the other files
 """
-from API.Transaction import Transaction 
+
 from API.User import User
 import time as t
 import API.Fichier as fichier
-import os
+import subprocess
 import platform
-import struct
 from getpass import getpass
-import hashlib
 import pickle
-from io import BufferedWriter, FileIO, BufferedReader
+
 
 nom="" # Initializing username's variable for all functions
 users=[] # Initializing the container for all names existant in te system
@@ -33,7 +31,7 @@ names=[] # List of usernames
 info_users=None # Initializing the variable that'll be used for containing users complete connexion information
 info_names=None # Initializing the variable that'll be used for containing username information
 
-animation = [
+animation = [ # The animation is there to let the user process what is happening
 "[        ]",
 "[=       ]",
 "[===     ]",
@@ -56,6 +54,9 @@ animation = [
 
 
 def wait(second : int): 
+    """
+    Fonction printing the animation according to the waiting time passed in argument.
+    """
     i = 0 
     while True:
         print(animation[i % len(animation)], end='\r')
@@ -65,38 +66,37 @@ def wait(second : int):
             break
 
 
-
-
-
-"""
-Method that cleans the screen using command prompt
-
-    clc if your a windows user
-    clear if you a Unix base user
-
-"""
 def screen_clear()->None:
+     """
+     Function that cleans the screen using command prompt
+
+     clc if your a windows user
+     clear if you a Unix base user
+
+     """
      if(platform.system() == "Windows"):
-         os.system('cls')
+         _ = subprocess.call('cls', shell = True)
      else:
-         os.system('clear')
+         _ = subprocess.call('clear', shell = True)
 
 def choice_is_due() -> str:
+     """
+     Function returning the input when a choice between deposit and withdraw
+     """
      return input("Vous pouvez:\nDéposer, Retirer, Quitter\nEntrez votre choix (d/r/q) : ")
 
-"""
-Basic configuration for endeling display. So a simple Textbase User Interface(TUI)0
-"""
-
 def open_session(name,pwd):
+    """
+    Basic configuration to handle the display. A simple Textbase User Interface(TUI)
+    """
     global users, names
     if name+pwd in users:
         screen_clear()
-        print("Log in .")
+        print("Log in :")
         wait(1)
         return True
     elif name in names:
-         print("Mauvais mot de passe veuillez essayer à nouveau.")
+         print("Mauvais mot de passe.\nVeuillez essayer à nouveau.")
          wait(1)
          return False
     else:
@@ -125,29 +125,34 @@ def open_session(name,pwd):
                 continue
             
 def get_username():
+    """
+    Function to handle what the user enters to assure there was not mistakes with what the user typed.
+    """
 
     global users, info_users, nom
 
     # Initialize classes
-    while(True):
-        while True:
-            screen_clear()
-            print("Bienvenue sur Finance Pro Max!")
-            name :str = input("Quel est votre nom d'utilisateur : ")
-            nom=name
-            if(len(nom)>0):
-                if nom in users:
-                    screen_clear()
-                    print("Utilisateur existant.")
-                    print("Vous aurez trois tentatives pour le mot de passe.")
-                    wait(1)
-                    return nom
-                else:
-                    return nom
+    while True:
+        screen_clear()
+        print("Bienvenue sur Finance Pro Max!")
+        name: str = input("Quel est votre nom d'utilisateur : ")
+        nom = name
+        if(len(nom)>0):
+            if nom in users:
+                screen_clear()
+                print("Utilisateur existant.")
+                print("Vous aurez trois tentatives pour le mot de passe.")
+                wait(1)
+                return nom
             else:
-                continue
+                return nom
+        else:
+            continue
 
 def get_password(nom):
+    """
+    Function to get the user's password.
+    """
     while True:        
             screen_clear()
             print("Bienvenue sur Finance Pro Max!")
@@ -162,6 +167,9 @@ def get_password(nom):
 def simple_ui()->None:
     # Calling global variables useful in the function
     global users, names, info_users, info_names
+
+    # Create the user variable for pylance to unserstand it exist when called in the isistance in the while loop later on.
+    user = None
 
     # Reading users et usernames files to be able to verify in the inputs corresponds to an exxisting user
     info_users=fichier.read_content("users_list")
@@ -185,20 +193,21 @@ def simple_ui()->None:
             password=get_password(name)
             if(open_session(name,password)):
                     user=User(name,password)
-                    user_validation=True
                     break
             tentatives_password+=1
             if tentatives_password==3:
                 screen_clear()
                 print("Pour des raisons de cybersécurité, votre entrée a été interdite.")
                 wait(3)
-                user_validation=False
                 break
-            else:
+            elif name in names:
                 continue
+            else:
+                name=get_username()
     
         # Main loop that display the app
-        while user_validation:
+        #while user_validation:7
+        while isinstance(user, User):
             #clean the screen
             screen_clear()
             if(user.print_historic() != ""):
@@ -212,7 +221,7 @@ def simple_ui()->None:
             choix = choice_is_due()  
             if choix == "d" or choix == "r":  
                 #add transaction 
-                user.add_transaction(input("Entrez votre dépot en dollars CAD : ",).replace(",","."),choix)
+                user.add_transaction(input("Entrez votre dépot en dollars CAD : ",).replace(",","."),choix, input("Entrez le type de transaction: "))
                 continue
             elif(choix == "q"):
                 #clear the screen show the solde and end the app
