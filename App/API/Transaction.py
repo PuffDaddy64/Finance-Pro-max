@@ -5,7 +5,7 @@
  Name Of File : Transaction.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 7 août 2026
+ Date : 26 août 2026
  
 Description  : Class for the transaction handling with deposit and withdraw.
                The class is called from the frontend (UI) for displaying infos
@@ -15,16 +15,21 @@ Description  : Class for the transaction handling with deposit and withdraw.
 import time as t
 
 class Transaction:
-    def __init__(self, montant:str, choix:str, date, raison_transaction:str) -> None:
+    def __init__(self, id:int, montant:str, choix:str, date, raison:str) -> None:
          """
              Initialize values
          """ 
-         self.set_montant(montant, choix) 
+         self.id = id
+         self.set_raison(raison = raison)
+         self.set_montant(montant, choix)
          self.date = date
-         self.set_raison_transaction(raison = raison_transaction)
 
+ # Methods related to the id
+    def get_id(self):
+        return self.id
+     
  # Methods related to the date ofthe transaction
-    def get_date(self):
+    def get_date(self) -> str:
         """
             Method that returns the date
         """
@@ -68,9 +73,17 @@ class Transaction:
         """
         return self.montant
 
+# Methods related to the transaction type
+
+    def get_type(self) -> str:
+        if self.get_montant() > 0:
+            return "Dépôt"
+        else:
+            return "Retrait"
+
  # Methods related to the reason of the transaction
 
-    def validation_raison_transaction(self, raison:str) -> bool:
+    def validation_raison(self, raison:str) -> bool:
         if len(raison) == 0:
             print("Vous n'avez pas entré de raison pour votre transaction.")
             self.raison_valide = False
@@ -79,15 +92,15 @@ class Transaction:
         self.raison_valide = True
         return True
     
-    def set_raison_transaction(self, raison: str) -> str | None:
-        if self.validation_raison_transaction( raison = raison):
-             self.type_de_transaction: str = raison
+    def set_raison(self, raison: str) -> str | None:
+        if self.validation_raison( raison = raison):
+             self.raison: str = raison
     
-    def get_raison_transaction(self) -> str:
+    def get_raison(self) -> str:
         """
         Method that returns the class variable raison_transaction.
         """
-        return self.type_de_transaction
+        return self.raison
 
     # Method regrouping the completion of a validation
     def valid_transaction(self):

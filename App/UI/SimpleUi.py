@@ -4,7 +4,7 @@
  Name Of File : SimpleUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 7 août 2026
+ Date : 26 août 2026
 
 Description : Simple TUI Handler, nothing crazy just the base. Also, there is actually a memory management here, but it should be moved
 at another place.
@@ -217,11 +217,15 @@ def simple_ui()->None:
                 
             #display the solde
             print(user)
-            #User make is is choice
+            #User make his choice
             choix = choice_is_due()  
-            if choix == "d" or choix == "r":  
+            if choix == "d":  
                 #add transaction 
                 user.add_transaction(input("Entrez votre dépot en dollars CAD : ",).replace(",","."),choix, input("Entrez le type de transaction: "))
+                continue
+            elif choix == "r":
+                #add transaction 
+                user.add_transaction(input("Entrez votre retrait en dollars CAD : ",).replace(",","."),choix, input("Entrez le type de transaction: "))
                 continue
             elif(choix == "q"):
                 #clear the screen show the solde and end the app
