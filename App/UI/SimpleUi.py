@@ -4,7 +4,7 @@
  Name Of File : SimpleUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 26 août 2026
+ Date : 27 août 2026
 
 Description : Simple TUI Handler, nothing crazy just the base. Also, there is actually a memory management here, but it should be moved
 at another place.
@@ -83,7 +83,7 @@ def choice_is_due() -> str:
      """
      Function returning the input when a choice between deposit and withdraw
      """
-     return input("Vous pouvez:\nDéposer, Retirer, Quitter\nEntrez votre choix (d/r/q) : ")
+     return input("Vous pouvez:\nDéposer, Retirer, Quitter ou Modifier une transaction\nEntrez votre choix (d/r/q/m) : ")
 
 def open_session(name,pwd):
     """
@@ -208,18 +208,34 @@ def simple_ui()->None:
         # Main loop that display the app
         #while user_validation:7
         while isinstance(user, User):
-            #clean the screen
+            # Clean the screen
             screen_clear()
             if(user.print_historic() != ""):
+                # Dislpay historic
                 print(user.print_historic())
-                
-            #dislpay historic
-                
-            #display the solde
+                  
+            # Display the solde
             print(user)
-            #User make his choice
-            choix = choice_is_due()  
-            if choix == "d":  
+
+            # User makes his choice
+            choix = choice_is_due()
+            if choix == "m":
+                if len(user.get_transactions().keys()) != 0:
+                    screen_clear()
+                    print(user.print_historic())
+                    id_to_modify = input(f"\nEntrez l'ID({min(user.transactions.keys())} à {max(user.transactions.keys())}) de la transaction que vous souhaitez modifier: ")
+                    while not user.validation_id_transaction(id_to_modify):
+                        id_to_modify = input(f"Entrez l'ID({min(user.transactions.keys())} à {max(user.transactions.keys())}) de la transaction que vous souhaitez modifier: ")
+                    screen_clear()
+                    transaction_to_modify = user.get_transaction(int(id_to_modify))
+                    transaction_to_modify.print(user.column_format)
+                    transaction_to_modify.modify()
+                else:
+                    print("Vous n'avez pas de transactions actuellement.")
+                    t.sleep(1)
+                    continue
+               
+            elif choix == "d":  
                 #add transaction 
                 user.add_transaction(input("Entrez votre dépot en dollars CAD : ",).replace(",","."),choix, input("Entrez le type de transaction: "))
                 continue
