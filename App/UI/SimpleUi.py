@@ -4,7 +4,7 @@
  Name Of File : SimpleUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 27 août 2026
+ Date : 28 août 2026
 
 Description : Simple TUI Handler, nothing crazy just the base. Also, there is actually a memory management here, but it should be moved
 at another place.
@@ -208,6 +208,8 @@ def simple_ui()->None:
         # Main loop that display the app
         #while user_validation:7
         while isinstance(user, User):
+            # Save user's information each modification
+            user.save_info()
             # Clean the screen
             screen_clear()
             if(user.print_historic() != ""):
