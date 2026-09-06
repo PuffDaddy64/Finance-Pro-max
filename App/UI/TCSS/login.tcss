@@ -1,0 +1,48 @@
+
+ 
+ Screen{
+     align: center middle;
+}
+
+
+
+Vertical{
+	Label{
+		border: ascii white 62%;
+		padding:1;
+
+		align: center middle;
+
+		color: #ffcc00 80%;		
+	}
+
+		
+		Horizontal{
+			
+			border: double white 55%;
+			height: auto;
+			margin-bottom:0;
+		
+			Container{
+				align: center top;
+				margin:2;
+				padding:1;
+				height: auto;
+
+				Input{
+					background:white 0%;
+					border: dashed #ffcc00 20%;
+					tint: #267326 5%;
+					border-subtitle-color: #cccc00 75%;
+					 
+				}
+				Input:focus{
+					border: dashed #ffcc00 50%;
+					background: yellow 15%;
+				}
+				
+
+		}		
+
+			}
+}
