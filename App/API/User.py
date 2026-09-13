@@ -6,7 +6,7 @@
  Name Of File : User.py
  Author : Thomas Raymond
  Author : Félix Roussin
- Date : 27 août 2026
+ Date : 5 septembre 2026
  
 Description  : Class for managing user's past sessions.
                 The Class is call from the frontend (UI) for saving info
@@ -27,14 +27,14 @@ class User:
             self.key:str = self.get_hash(pwd)
             info_user = self.retrieve_info(self.key)
             if info_user is not None:
-                self.next_transaction_id = info_user['id']
-                self.column_format = info_user['column_format']
-                self.transactions = info_user['transactions']
+                self.next_transaction_id:int = info_user['id']
+                self.column_format:dict = info_user['column_format']
+                self.transactions:dict= info_user['transactions']
             else:
-                self.transactions = {}
-                self.next_transaction_id = 1
-                self.raisons_transaction = {} # Variables inutilisée pour l'instant elle servira à trier les transactions selon leur raison
-                self.column_format = {"ID":len('ID') + 1, 'Raison':len('Raison') + 2, 'Montant':len('Montant') + 2, 'Date':len('Date') + 2}
+                self.transactions:dict = {}
+                self.next_transaction_id:int = 1
+                self.raisons_transaction:dict = {} # Variables inutilisée pour l'instant elle servira à trier les transactions selon leur raison
+                self.column_format:dict = {"ID":len('ID') + 1, 'Raison':len('Raison') + 2, 'Montant':len('Montant') + 2, 'Date':len('Date') + 2}
                 return None
 
     # Methods related to the hash of the user
@@ -79,7 +79,7 @@ class User:
         if wanted_transaction.valid_transaction():
             # Créer la transaction
             transaction:Transaction = wanted_transaction 
-            self.transactions[transaction.get_id()] = transaction
+            self.transactions[id] = transaction
             self.next_transaction_id += 1
             self.column_format["ID"] = max(self.column_format["ID"], len(str(transaction.id)) + 2)
             self.column_format["Raison"] = max(self.column_format["Raison"], len(transaction.raison) + 2)
@@ -119,7 +119,7 @@ class User:
             if id in self.get_transactions().keys():
                 return True
             else:
-                print("Aucune transaction n'a cette ID")
+                print("Aucune transaction n'a cet ID")
                 t.sleep(1)
                 return False
         else:
