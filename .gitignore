@@ -9,6 +9,7 @@ __pycache__/
 
 .memory/
 
+.vscode/
 
 # C extensions
 *.so

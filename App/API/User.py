@@ -66,6 +66,16 @@ class User:
         """
         fichier.write_object_binary(self.key, {"transactions":self.transactions, "id":self.next_transaction_id, "column_format":self.column_format})
 
+
+
+
+    def get_name(self) -> str:
+        """
+        Method returning the name of the user
+        """
+        return self.name
+
+    
     # Methods related to its transactions
     def add_transaction(self, montant:str, choix:str, raison:str) -> None:
         """
@@ -153,7 +163,7 @@ class User:
 
         # Adding to the string, if there are, all transactions
         if len(self.transactions) > 0:
-            historic_widget += "Votre historique :\n"
+            #historic_widget += "Votre historique :\n"
 
             # Adding to the string, if there are, all deposits
             depots:list = self.get_depots()
@@ -161,7 +171,7 @@ class User:
                 historic_widget += "Vos dépôts: \n"
                 historic_widget += f"{'ID':^{self.column_format['ID']}}{'Raison':^{self.column_format['Raison']}}{'Montant':^{self.column_format['Montant']}}{'Date':^{self.column_format['Date']}}\n"
                 for i in depots:
-                    historic_widget += prGreen(f"{i.get_id():^{self.column_format['ID']}}{i.get_raison():^{self.column_format['Raison']}}{i.get_montant():^{self.column_format['Montant']}.2f}{str(i.get_date()):^{self.column_format['Date']}}")
+                    historic_widget += (f"{i.get_id():^{self.column_format['ID']}}{i.get_raison():^{self.column_format['Raison']}}{i.get_montant():^{self.column_format['Montant']}.2f}{str(i.get_date()):^{self.column_format['Date']}}")
                     historic_widget += "\n"
             
             # Adding to the string, if there are, all withdraws
@@ -170,7 +180,7 @@ class User:
                 historic_widget += "\nVos retraits: \n"
                 historic_widget += f"{'ID':^{self.column_format['ID']}}{'Raison':^{self.column_format['Raison']}}{'Montant':^{self.column_format['Montant']}}{'Date':^{self.column_format['Date']}}\n"
                 for i in retraits:
-                    historic_widget += prRed(f"{i.get_id():^{self.column_format['ID']}}{i.get_raison():^{self.column_format['Raison']}}{i. get_montant():^{self.column_format['Montant']}.2f}{str(i.get_date()):^{self.column_format['Date']}}")
+                    historic_widget += (f"{i.get_id():^{self.column_format['ID']}}{i.get_raison():^{self.column_format['Raison']}}{i. get_montant():^{self.column_format['Montant']}.2f}{str(i.get_date()):^{self.column_format['Date']}}")
                     historic_widget += "\n"
 
         return historic_widget

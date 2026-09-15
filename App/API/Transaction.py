@@ -15,10 +15,13 @@ import time as t
 import datetime
 
 class Transaction:
-    def __init__(self, choix:str, id:int, raison:str, montant:str) -> None:
+
+
+    def __init__(self,choix:int, id:int, raison:str, montant:float) -> None:
          """
              Initialize values
          """ 
+
          self.id:int = id
          self.set_raison(raison = raison)
          self.set_montant(montant, choix)
