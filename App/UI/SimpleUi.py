@@ -8,6 +8,13 @@
 
 Description : Simple TUI Handler, nothing crazy, just the base. Also, there is actually a memory management here, but it should be moved at another place.
 """
+import os
+
+
+import sys
+
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from API.User import User
 import time as t
@@ -18,7 +25,7 @@ from getpass import getpass
 import pickle
 
 # Global variables
-users:list = [] # Initializing the container for all users existant in te system
+users:list = [] # Initializing the container for all users existant in the system
 names:list = [] # List of usernames
 animation:list = [ # The animation is there to let the user process what is happening
 "[        ]",

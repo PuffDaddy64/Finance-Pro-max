@@ -37,6 +37,13 @@ class User:
                 self.column_format:dict = {"ID":len('ID') + 1, 'Raison':len('Raison') + 2, 'Montant':len('Montant') + 2, 'Date':len('Date') + 2}
                 return None
 
+
+    def get_name(self) -> str:
+        """
+        Method returning the name of the user
+        """
+        return self.name
+
     # Methods related to the hash of the user
     def get_hash( self, psw : str ):
             hash_obj = hashlib.sha256((self.name+psw).encode())
@@ -66,16 +73,6 @@ class User:
         """
         fichier.write_object_binary(self.key, {"transactions":self.transactions, "id":self.next_transaction_id, "column_format":self.column_format})
 
-
-
-
-    def get_name(self) -> str:
-        """
-        Method returning the name of the user
-        """
-        return self.name
-
-    
     # Methods related to its transactions
     def add_transaction(self, montant:str, choix:str, raison:str) -> None:
         """
@@ -168,7 +165,7 @@ class User:
             # Adding to the string, if there are, all deposits
             depots:list = self.get_depots()
             if len(depots) != 0:
-                historic_widget += "Vos dépôts: \n"
+               # historic_widget += "Vos dépôts: \n"
                 historic_widget += f"{'ID':^{self.column_format['ID']}}{'Raison':^{self.column_format['Raison']}}{'Montant':^{self.column_format['Montant']}}{'Date':^{self.column_format['Date']}}\n"
                 for i in depots:
                     historic_widget += (f"{i.get_id():^{self.column_format['ID']}}{i.get_raison():^{self.column_format['Raison']}}{i.get_montant():^{self.column_format['Montant']}.2f}{str(i.get_date()):^{self.column_format['Date']}}")
@@ -177,7 +174,7 @@ class User:
             # Adding to the string, if there are, all withdraws
             retraits:list = self.get_retraits()
             if len(retraits) != 0:
-                historic_widget += "\nVos retraits: \n"
+               # historic_widget += "\nVos retraits: \n"
                 historic_widget += f"{'ID':^{self.column_format['ID']}}{'Raison':^{self.column_format['Raison']}}{'Montant':^{self.column_format['Montant']}}{'Date':^{self.column_format['Date']}}\n"
                 for i in retraits:
                     historic_widget += (f"{i.get_id():^{self.column_format['ID']}}{i.get_raison():^{self.column_format['Raison']}}{i. get_montant():^{self.column_format['Montant']}.2f}{str(i.get_date()):^{self.column_format['Date']}}")

@@ -6,7 +6,7 @@
 
 
 
-Vertical{
+#login{
 	Label{
 		border: ascii white 62%;
 		padding:1;
@@ -17,32 +17,161 @@ Vertical{
 	}
 
 		
-		Horizontal{
-			
-			border: double white 55%;
-			height: auto;
-			margin-bottom:0;
+	#messageBox{
 		
-			Container{
-				align: center top;
-				margin:2;
-				padding:1;
-				height: auto;
+		border: double white 55%;
+		box-sizing: border-box;
+		max-height: 45%;
+		margin-bottom:0;
+	
+		Container{
+			align: center top;
+			margin:2;
+			padding:1;
+			height: auto;
 
-				Input{
-					background:white 0%;
-					border: dashed #ffcc00 20%;
-					tint: #267326 5%;
-					border-subtitle-color: #cccc00 75%;
-					 
-				}
-				Input:focus{
-					border: dashed #ffcc00 50%;
-					background: yellow 15%;
-				}
-				
+			Input{
+				background:white 0%;
+				border: dashed #ffcc00 20%;
+				tint: #267326 5%;
+				border-subtitle-color: #cccc00 75%;
+					
+			}
+			Input:focus{
+				border: dashed #ffcc00 50%;
+				background: yellow 15%;
+			}
 
-		}		
+			Input.invalid:focus{
+				border-title-color:  #ff3c00 75%;
+				background: #ff3c00 5%;	
+				border: dashed #ff3c00 50%;
+
 
 			}
+			Input.invalid{
+				border: dashed #ff3c00 20%;
+				border-title-color:  #ff3c00 50%;
+			}
+		}
+		
+
+		Label{
+			align: center bottom;
+		}
+		#errorMessage {
+			align: right top;
+			margin: 0 ;	
+			padding: 0;
+			Label{
+				border: dashed #ffcc00 20%;
+				align: right top;
+				padding:2 0;
+				margin:0;}
+		}
+		#buttonBox{
+			box-sizing: border-box;
+			margin: 0;
+		 Button{
+			max-height: 50%;
+			
+		 }
+		 #yes{
+				border: dashed #ffcc00 20%;
+				background:white 0%;
+			}
+			#yes:focus{
+				background: yellow 15%;
+				border: dashed #ffcc00 75%;
+			}
+			#no{
+				margin:1 0 0 0 ;
+				border: dashed #ff3c00 20%;
+				background:white 0%;
+			}
+			#no:focus{
+				border: dashed #ff3c00 50%;
+				background: #ff3c00 5%;
+			}
+		}
+
+
+
+	}
+	.invalid{
+		border: dashed #ff3c00 20%;
+		background: #ff3c00 5%;
+	}
 }
+
+
+#body{
+    height: 100%;
+    width: 100%;
+    
+
+    #top{
+        height: 10%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        #menu{
+            height: 100%;
+            width: 20%;
+            padding: 0;
+        }
+        #montant{
+            Input{
+                background:white 0%;
+                border: dashed #ffcc00 20%;
+                tint: #267326 5%;
+                border-subtitle-color: #cccc00 75%;
+            }
+            height: 100%;
+            width: 80%;
+            
+            #chiffre{
+                height: 100%;
+                width: 100%;
+            }
+            #ID{
+                height: 100%;
+                width: 20%;
+                display: none;
+            }
+
+
+        }
+    }
+        
+    #middle{
+        height: 90%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        #info{
+            height: 100%;
+            width: 20%;
+            margin: 1;
+        }
+        #table{
+            height: 100%;
+            width: 80%;
+        }
+    }
+
+
+    
+    
+
+
+
+
+
+
+}
+
+
+
+
+

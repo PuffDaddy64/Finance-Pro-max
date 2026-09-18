@@ -17,7 +17,7 @@ import UI.SimpleUi as Sui
 import UI.Tui
 
 if __name__ == "__main__":
-    Tui = False
+    Tui = True # True for TUI, False for SimpleUI
     if Tui:
         UI.Tui.lauch_ui()
     else:
