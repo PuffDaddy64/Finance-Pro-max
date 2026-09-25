@@ -4,7 +4,7 @@
  Name Of File : TUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 10 septembre 2026
+ Date : 24 septembre 2026
 
 Description : UI handler whic appearsin the terminal. This UI is built with a library called Textual.
 """
@@ -124,9 +124,10 @@ class Login(App):
                     Horizontal(
                         Container(
                             RadioSet(
-                                RadioButton("Depot", value="depot", id="depot"), # À voir les strings pour value, Python les interprètes quand même comme des bool pareil, mais value devrait être bool.
-                                RadioButton("Retrait", value="retrait", id="retrait"),
-                                RadioButton("Modifier", value="modifier", id="modification"),
+                                RadioButton("Depot", id="d", value = True),
+                                RadioButton("Retrait", id="r"),
+                                RadioButton("Modifier", id="m"),
+                                id = "options"
                             ),
                         id="menu",
                         ),    
@@ -186,7 +187,7 @@ class Login(App):
         global user
         user = User(username, pwd)
 
-    def second_page(self):
+    async def second_page(self):
         """
         Method to display the second page of the app
         """
@@ -194,18 +195,23 @@ class Login(App):
         ROWS = []
         self.query_one("#body").display = True
         ROWS = self.make_rows(user)
-        self.query_one("#table").add_columns(*ROWS[0])
-        self.query_one("#table").add_rows(ROWS[1:])
+        table_transactions = self.query_one("#table", DataTable)
+        table_transactions.clear(columns = True)
+        table_transactions.add_columns(*ROWS[0])
+        table_transactions.add_rows(ROWS[1:])
         labels = self.query_one( "#info")
+        await labels.remove_children()
         labels.mount(Label(user.get_name()))
         labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}"))
         
     async def second_page_treatment(self):
         montant = self.query_one("#chiffre", Input).value
         if user is not None:
-            user.add_transaction(montant = montant, choix = "d", raison = "Test")
+            menu = self.query_one("#options", RadioSet)
+            choix = menu.pressed_button
+            user.add_transaction(montant = montant, choix = choix.id, raison = "Test")
             user.save_info()
-            self.second_page()
+            await self.second_page()
         else:
             raise ValueError("The user hasn't been set and we are yet on second page")
 
@@ -216,7 +222,7 @@ class Login(App):
         self.exit()
 
 
-    def connect(self, username:str , pwd:str) -> None:
+    async def connect(self, username:str , pwd:str) -> None:
         """
         Method to connect the user to the app
         """
@@ -228,7 +234,7 @@ class Login(App):
             if username + pwd in users:
                 self.query_one("#login", Vertical).remove()
                 self.activate_user(username, pwd)
-                self.second_page()
+                await self.second_page()
                 self.state += 1
                 
 
@@ -277,7 +283,7 @@ class Login(App):
             self.pwd.border_title = ""
         
         if((self.username.is_valid) and (self.pwd.is_valid)):
-            self.connect(self.username.value, self.pwd.value)
+            await self.connect(self.username.value, self.pwd.value)
             
 
     # Methods related to the reaction to user's inputs
