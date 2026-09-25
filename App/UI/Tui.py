@@ -26,7 +26,6 @@ from typing import ClassVar
 # Import from SimpleUI which is the old UI
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from API.User import User
-import UI.base as base
 import time as t
 import API.Fichier as fichier
 import subprocess
