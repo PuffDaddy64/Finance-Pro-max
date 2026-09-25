@@ -4,7 +4,7 @@
  Name Of File : TUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 10 septembre 2026
+ Date : 24 septembre 2026
 
 Description : UI handler whic appearsin the terminal. This UI is built with a library called Textual.
 """
@@ -63,9 +63,9 @@ class Login(App):
     CSS_PATH="TCSS/login.tcss"
 
 
-    BINDINGS: ClassVar[list[Binding]]=[
-        Binding("ctrl+q","save_and_quit","Quit",show=True,priority=True),
-    ] # I dont't know what it is...
+    BINDINGS: ClassVar[list[Binding]] = [
+        Binding("ctrl+q", "save_and_quit", "Quit", show = True, priority = True),
+    ]
     
     # Methods related to the App apperance
     def compose(self) -> ComposeResult:
@@ -124,9 +124,10 @@ class Login(App):
                     Horizontal(
                         Container(
                             RadioSet(
-                                RadioButton("Depot", value="depot", id="depot"),
-                                RadioButton("Retrait", value="retrait", id="retrait"),
-                                RadioButton("Modifier", value="modifier", id="modification"),
+                                RadioButton("Depot", id="d", value = True),
+                                RadioButton("Retrait", id="r"),
+                                RadioButton("Modifier", id="m"),
+                                id = "options"
                             ),
                         id="menu",
                         ),    
@@ -155,6 +156,7 @@ class Login(App):
                     ),
                     id="body",
                 ) 
+        self.state = 0
 
     def on_mount(self)-> None:
         """
@@ -171,7 +173,7 @@ class Login(App):
         inputPassword = self.query_one('#pwd', Input) 
         inputPassword.border_subtitle = "Password"
 
-    def make_rows(self, username:str, pwd:str, user:User) -> None:
+    def make_rows(self, user:User):
         """
         Method to make the rows of the table
         """
@@ -181,23 +183,37 @@ class Login(App):
             formated_transactions.append((str(transaction), str(historic_transactions[transaction].get_raison()) , str(historic_transactions[transaction].get_montant()), str(historic_transactions[transaction].get_date())))
         return formated_transactions
 
-    def second_page(self, username:str, pwd:str):
+    def activate_user(self, username:str, pwd:str):
+        global user
+        user = User(username, pwd)
+
+    async def second_page(self):
         """
         Method to display the second page of the app
         """
         global user
         ROWS = []
         self.query_one("#body").display = True
-        if(user == None):
-            user = User(username, pwd)
-        ROWS = self.make_rows(username, pwd, user)
-        self.query_one("#table").add_columns(*ROWS[0])
-        self.query_one("#table").add_rows(ROWS[1:])
+        ROWS = self.make_rows(user)
+        table_transactions = self.query_one("#table", DataTable)
+        table_transactions.clear(columns = True)
+        table_transactions.add_columns(*ROWS[0])
+        table_transactions.add_rows(ROWS[1:])
         labels = self.query_one( "#info")
+        await labels.remove_children()
         labels.mount(Label(user.get_name()))
         labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}"))
         
-
+    async def second_page_treatment(self):
+        montant = self.query_one("#chiffre", Input).value
+        if user is not None:
+            menu = self.query_one("#options", RadioSet)
+            choix = menu.pressed_button
+            user.add_transaction(montant = montant, choix = choix.id, raison = "Test")
+            user.save_info()
+            await self.second_page()
+        else:
+            raise ValueError("The user hasn't been set and we are yet on second page")
 
     def action_save_and_quit(self):
         global user
@@ -206,7 +222,7 @@ class Login(App):
         self.exit()
 
 
-    def connect(self, username:str , pwd:str ,) -> None:
+    async def connect(self, username:str , pwd:str) -> None:
         """
         Method to connect the user to the app
         """
@@ -217,7 +233,9 @@ class Login(App):
             # Check if the password is correct
             if username + pwd in users:
                 self.query_one("#login", Vertical).remove()
-                self.second_page(username, pwd)
+                self.activate_user(username, pwd)
+                await self.second_page()
+                self.state += 1
                 
 
             else:
@@ -245,47 +263,52 @@ class Login(App):
             butttonBox.mount(Button("OUI",id="yes",))
             butttonBox.mount(Button("NON",id="no",))
     
-                                
-
-
-    # Methods related to the reaction to user's inputs
-    async def on_input_submitted(self, event: Input.Submitted):
-        """
-        Method called by textual when the enter key is pushed on an input
-        """
+    async def login_page_treatment(self):
+        """Method treating the information entered on the login page"""             
         # Get the information entred
-
         self.username, self.pwd = self.query_one("#user", Input), self.query_one("#pwd", Input)
-
+        
         if((self.username.is_valid)==False ):
             self.username.border_title = "Sorry Username need to be longer than 5 characters"
             self.username.add_class("invalid",update=True)
         else:
             self.username.remove_class("invalid",update=True)
             self.username.border_title = ""
-
+        
         if((self.pwd.is_valid)==False ):
             self.pwd.border_title = "Sorry Password need to be longer than 4 characters"
             self.pwd.add_class("invalid",update=True)
         else:
             self.pwd.remove_class("invalid",update=True)
             self.pwd.border_title = ""
-
+        
         if((self.username.is_valid) and (self.pwd.is_valid)):
-            self.connect(self.username.value, self.pwd.value)
+            await self.connect(self.username.value, self.pwd.value)
+            
+
+    # Methods related to the reaction to user's inputs
+    async def on_input_submitted(self, event: Input.Submitted):
+        """
+        Method called by textual when the enter key is pushed on an input
+        """
+        if self.state == 0: # Login page
+            await self.login_page_treatment()
+
+        elif self.state == 1: # Second page
+            await self.second_page_treatment()
 
     def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
         global users, names,user
 
         if(button_pressed == "yes"):
-            new_user = User((self.query_one("#user").value),(self.query_one("#pwd").value))
+            new_user = User((self.query_one("#user", Input).value),(self.query_one("#pwd", Input).value))
             user = new_user
-            fichier.add_object_binary("users_list", (self.query_one("#user").value) + (self.query_one("#pwd").value))
-            fichier.add_object_binary("names", (self.query_one("#user").value))
-            users.append((self.query_one("#user").value) + (self.query_one("#pwd").value))
-            names.append(self.query_one("#user").value) 
-            self.connect(self.query_one("#user").value,self.query_one("#pwd").value)
+            fichier.add_object_binary("users_list", (self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
+            fichier.add_object_binary("names", (self.query_one("#user", Input).value))
+            users.append((self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
+            names.append(self.query_one("#user", Input).value) 
+            self.connect(self.query_one("#user", Input).value,self.query_one("#pwd", Input).value)
         elif(button_pressed == "no"):
             txt = self.query_one("#errorMessage")
             buttons = self.query_one("#buttonBox")

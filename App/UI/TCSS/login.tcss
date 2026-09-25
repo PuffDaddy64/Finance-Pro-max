@@ -159,19 +159,59 @@
             width: 80%;
         }
     }
-
-
-    
-    
-
-
-
-
-
-
 }
 
 
+#body{
+    height: 100%;
+    width: 100%;
+    
 
-
-
+    #top{
+        height: 15%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        #menu{
+            height: 100%;
+            width: 20%;
+            padding: 0;
+        }
+        #montant{
+            Input{
+                background:white 0%;
+                border: dashed #ffcc00 20%;
+                tint: #267326 5%;
+                border-subtitle-color: #cccc00 75%;
+            }
+            height: 100%;
+            width: 80%;
+            
+            #chiffre{
+                height: 100%;
+                width: 100%;
+            }
+            #ID{
+                height: 100%;
+                width: 20%;
+                display: none;
+            }
+        }
+    }
+        
+    #middle{
+        height: 85%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        #info{
+            height: 100%;
+            width: 20%;
+            margin: 1;
+        }
+        #table{
+            height: 100%;
+            width: 80%;
+        }
+    }
+}
