@@ -27,12 +27,11 @@ class User:
             self.key:str = self.get_hash(pwd)
             info_user = self.retrieve_info(self.key)
             if info_user is not None:
-                self.next_transaction_id:int = info_user['id']
                 self.column_format:dict = info_user['column_format']
                 self.transactions:dict= info_user['transactions']
+                Transaction.ID = len(self.transactions)
             else:
                 self.transactions:dict = {}
-                self.next_transaction_id:int = 1
                 self.raisons_transaction:dict = {} # Variables inutilisée pour l'instant elle servira à trier les transactions selon leur raison
                 self.column_format:dict = {"ID":len('ID') + 1, 'Raison':len('Raison') + 2, 'Montant':len('Montant') + 2, 'Date':len('Date') + 2}
                 return None
@@ -71,30 +70,26 @@ class User:
         """
         Method saving user's informations
         """
-        fichier.write_object_binary(self.key, {"transactions":self.transactions, "id":self.next_transaction_id, "column_format":self.column_format})
+        fichier.write_object_binary(self.key, {"transactions":self.transactions, "id":int, "column_format":self.column_format})
 
     # Methods related to its transactions
-    def add_transaction(self, montant:str, choix:str, raison:str) -> None:
+    def add_transaction(self,transaction:Transaction) -> None:
         """
         Method adding a transaction to the user
         """
-        # Obtenir les informations de la transaction
-        id:int = self.get_new_transaction_id()
-        wanted_transaction:Transaction = Transaction(choix = choix, id = id, raison = raison, montant = montant)
+        
 
         # Valider la transaction
-        if wanted_transaction.valid_transaction():
+        if transaction.valid_transaction():
             # Créer la transaction
-            transaction:Transaction = wanted_transaction 
-            self.transactions[id] = transaction
-            self.next_transaction_id += 1
+            self.transactions[transaction.get_id()] = transaction
             self.column_format["ID"] = max(self.column_format["ID"], len(str(transaction.id)) + 2)
             self.column_format["Raison"] = max(self.column_format["Raison"], len(transaction.raison) + 2)
             self.column_format["Montant"] = max(self.column_format["Montant"], len(str(transaction.montant)) + 2)
             self.column_format["Date"] = max(self.column_format["Date"], len(str(transaction.date)) + 2)
         else:
             # Détruire la transaction
-            del wanted_transaction
+            del transaction
  
     def get_depots(self) -> list:
         """
@@ -138,17 +133,7 @@ class User:
     def get_transaction(self, id:int) -> Transaction:
         return self.get_transactions()[int(id)]
 
-    def get_raisons_transaction(self):
-        """
-        Method returning all reasons for a transaction that the user has created
-        """
-        return  self.raisons_transaction
-
-    def get_new_transaction_id(self) -> int:
-        """
-        Method getting the new transactions ID
-        """
-        return self.next_transaction_id
+    
 
     # Methods related to the printing of the user's informations 
     def print_historic(self)->str:

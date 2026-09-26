@@ -16,13 +16,15 @@ import datetime
 
 class Transaction:
 
+    ID = 0
 
-    def __init__(self,choix:int, id:int, raison:str, montant:float) -> None:
+    def __init__(self,choix:int, raison:str, montant:float) -> None:
          """
              Initialize values
          """ 
 
-         self.id:int = id
+         self.id:int = Transaction.ID
+         Transaction.ID += 1
          self.set_raison(raison = raison)
          self.set_montant(montant, choix)
          self.set_date()

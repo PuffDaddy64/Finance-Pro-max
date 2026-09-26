@@ -13,6 +13,7 @@ import asyncio
 import os
 
 import sys
+import time
 
 from textual import on
 from textual.app import App,ComposeResult
@@ -26,6 +27,7 @@ from typing import ClassVar
 # Import from SimpleUI which is the old UI
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from API.User import User
+from API.Transaction import Transaction
 import time as t
 import API.Fichier as fichier
 import subprocess
@@ -54,6 +56,7 @@ class End(Button):
 
 # Class related to the actual lauching of the APP
 class Login(App):
+
     """
     Manages the APP, it's the most important class
     """
@@ -133,10 +136,11 @@ class Login(App):
                         ),    
                         Horizontal(
                             Input(
-                                id="ID"
+                                id="ID",
+                                classes="no_display"
                             ),
                             Input(
-                                
+                                type="number",
                             id="chiffre"  
                             ),
                             id="montant"
@@ -183,11 +187,13 @@ class Login(App):
             formated_transactions.append((str(transaction), str(historic_transactions[transaction].get_raison()) , str(historic_transactions[transaction].get_montant()), str(historic_transactions[transaction].get_date())))
         return formated_transactions
 
+
+
     def activate_user(self, username:str, pwd:str):
         global user
         user = User(username, pwd)
 
-    async def second_page(self):
+    def second_page(self):
         """
         Method to display the second page of the app
         """
@@ -200,20 +206,11 @@ class Login(App):
         table_transactions.add_columns(*ROWS[0])
         table_transactions.add_rows(ROWS[1:])
         labels = self.query_one( "#info")
-        await labels.remove_children()
+        labels.remove_children()
         labels.mount(Label(user.get_name()))
-        labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}"))
+        labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
         
-    async def second_page_treatment(self):
-        montant = self.query_one("#chiffre", Input).value
-        if user is not None:
-            menu = self.query_one("#options", RadioSet)
-            choix = menu.pressed_button
-            user.add_transaction(montant = montant, choix = choix.id, raison = "Test")
-            user.save_info()
-            await self.second_page()
-        else:
-            raise ValueError("The user hasn't been set and we are yet on second page")
+
 
     def action_save_and_quit(self):
         global user
@@ -222,7 +219,12 @@ class Login(App):
         self.exit()
 
 
-    async def connect(self, username:str , pwd:str) -> None:
+
+
+
+
+
+    def connect(self, username:str , pwd:str) -> None:
         """
         Method to connect the user to the app
         """
@@ -234,7 +236,7 @@ class Login(App):
             if username + pwd in users:
                 self.query_one("#login", Vertical).remove()
                 self.activate_user(username, pwd)
-                await self.second_page()
+                self.second_page()
                 self.state += 1
                 
 
@@ -262,8 +264,29 @@ class Login(App):
             messages.mount(Label("Utilisateur inexistant. Voulez-vous créer cet utilisateur?",id="mkuser"))
             butttonBox.mount(Button("OUI",id="yes",))
             butttonBox.mount(Button("NON",id="no",))
+
+    def make_row(self,transaction:Transaction):
+        table_transactions = self.query_one("#table", DataTable)
+        table_transactions.add_row(str(transaction.get_id()),transaction.get_raison(),transaction.get_montant(),str(transaction.get_date()))
+
+
+    async def second_page_treatment(self):
+        global user
+        montant = self.query_one("#chiffre", Input).value
+        if user is not None:
+            menu = self.query_one("#options", RadioSet)
+            choix = menu.pressed_button
+            new_transaction = Transaction(montant= montant,choix=choix.id,raison="Test")
+            user.add_transaction(new_transaction)
+            self.make_row(new_transaction)
+            self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
+            user.save_info()
+            
+        else:
+            raise ValueError("The user hasn't been set and we are yet on second page")
+
     
-    async def login_page_treatment(self):
+    def login_page_treatment(self):
         """Method treating the information entered on the login page"""             
         # Get the information entred
         self.username, self.pwd = self.query_one("#user", Input), self.query_one("#pwd", Input)
@@ -283,7 +306,28 @@ class Login(App):
             self.pwd.border_title = ""
         
         if((self.username.is_valid) and (self.pwd.is_valid)):
-            await self.connect(self.username.value, self.pwd.value)
+            self.connect(self.username.value, self.pwd.value)
+
+
+
+
+
+
+    def makeUser(self):
+        global users, names,user
+        new_user = User((self.query_one("#user", Input).value),(self.query_one("#pwd", Input).value))
+        user = new_user
+        fichier.add_object_binary("users_list", (self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
+        fichier.add_object_binary("names", (self.query_one("#user", Input).value))
+        users.append((self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
+        names.append(self.query_one("#user", Input).value) 
+        self.connect(self.query_one("#user", Input).value,self.query_one("#pwd", Input).value)
+
+
+
+
+
+
             
 
     # Methods related to the reaction to user's inputs
@@ -292,23 +336,31 @@ class Login(App):
         Method called by textual when the enter key is pushed on an input
         """
         if self.state == 0: # Login page
-            await self.login_page_treatment()
+            self.login_page_treatment()
 
         elif self.state == 1: # Second page
             await self.second_page_treatment()
+
+
+
+#TODO : Change the way it work to make it modify (I got an idea.)
+    def on_radio_set_changed(self, event:RadioSet.Changed):
+        radio_button = event.pressed
+        if radio_button.id == "m":
+            self.query_one("#ID",Input).display = True
+        else:
+            self.query_one("#ID",Input).display = False
+
+
+
+            
 
     def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
         global users, names,user
 
         if(button_pressed == "yes"):
-            new_user = User((self.query_one("#user", Input).value),(self.query_one("#pwd", Input).value))
-            user = new_user
-            fichier.add_object_binary("users_list", (self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
-            fichier.add_object_binary("names", (self.query_one("#user", Input).value))
-            users.append((self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
-            names.append(self.query_one("#user", Input).value) 
-            self.connect(self.query_one("#user", Input).value,self.query_one("#pwd", Input).value)
+           self.makeUser()
         elif(button_pressed == "no"):
             txt = self.query_one("#errorMessage")
             buttons = self.query_one("#buttonBox")
