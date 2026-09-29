@@ -5,7 +5,7 @@
  Name Of File : Transaction.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 27 août 2026
+ Date : 28 septembre 2026
  
 Description  : Class describing a transaction.
                The class is called from the User module to manage the information related to a particular transaction.
@@ -18,7 +18,7 @@ class Transaction:
 
     ID = 0
 
-    def __init__(self,choix:int, raison:str, montant:float) -> None:
+    def __init__(self, choix:str, raison:str, montant:str) -> None:
          """
              Initialize values
          """ 
@@ -133,8 +133,8 @@ class Transaction:
         except ValueError:
             print(f"La valeur entrée pour l'année n'est pas un nombre.")
             return False
-        if year < 0 and year <= 9999: # Le 9999 provient d'une contrainte datetime.date
-            print(f"Veuillez entrer une année supérieure à 0")
+        if year < 0 and year >= 9999: # Le 9999 provient d'une contrainte datetime.date
+            print(f"Veuillez entrer une année supérieure à 0 et inférieure à 9999")
             return False
         return True
 

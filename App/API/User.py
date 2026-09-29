@@ -6,7 +6,7 @@
  Name Of File : User.py
  Author : Thomas Raymond
  Author : Félix Roussin
- Date : 5 septembre 2026
+ Date : 28 septembre 2026
  
 Description  : Class for managing user's past sessions.
                 The Class is call from the frontend (UI) for saving info
@@ -73,7 +73,7 @@ class User:
         fichier.write_object_binary(self.key, {"transactions":self.transactions, "id":int, "column_format":self.column_format})
 
     # Methods related to its transactions
-    def add_transaction(self,transaction:Transaction) -> None:
+    def add_transaction(self, transaction:Transaction) -> None:
         """
         Method adding a transaction to the user
         """

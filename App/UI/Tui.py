@@ -4,7 +4,7 @@
  Name Of File : TUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 25 septembre 2026
+ Date : 28 septembre 2026
 
 Description : UI handler whic appearsin the terminal. This UI is built with a library called Textual.
 """
@@ -133,37 +133,25 @@ class Login(App):
                                 RadioButton("Retrait", id = "r"),
                                 RadioButton("Modifier", id = "m"),
                                 id = "options"
+                                ),
+                            id="menu",
                             ),
-                        id="menu",
-                        ),    
-                        Horizontal(
-                            Input(
-                                id="ID",
-                                classes="no_display"
-                            ),
-                            Input(
-                                type="number",
-                            id="chiffre"  
-                            ),
-                            id="montant"
-                        ),
-                        id="top",
-                        ),
-                    Horizontal(
                         Container(
                             Label(""),
                             Label(""),
-                            id = "info",
+                            id = "info"
                             ),
-                        id = "left",
+                        id = "left"
                         ),
                     Vertical(
                         Horizontal(
                             Input(
-                                id = "ID"
+                                id="ID",
+                                classes="no_display"
                                 ),
                             Input(   
-                                id = "chiffre"  
+                                type="number",
+                                id="chiffre" 
                                 ),
                             id = "montant"
                             ),
@@ -293,7 +281,7 @@ class Login(App):
         if user is not None:
             menu = self.query_one("#options", RadioSet)
             choix = menu.pressed_button
-            new_transaction = Transaction(montant= montant,choix=choix.id,raison="Test")
+            new_transaction = Transaction(montant = montant, choix = choix.id, raison="Test")
             user.add_transaction(new_transaction)
             self.make_row(new_transaction)
             self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
