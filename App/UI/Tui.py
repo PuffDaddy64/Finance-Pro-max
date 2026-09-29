@@ -4,7 +4,7 @@
  Name Of File : TUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 24 septembre 2026
+ Date : 25 septembre 2026
 
 Description : UI handler whic appearsin the terminal. This UI is built with a library called Textual.
 """
@@ -60,7 +60,7 @@ class Login(App):
     try_pwd:int = 3 # 3 tries for the pwd
 
     # Path related to the CSS file wich determines the format appearance of each widget represented in that file
-    CSS_PATH="TCSS/login.tcss"
+    CSS_PATH = "TCSS/login.tcss"
 
 
     BINDINGS: ClassVar[list[Binding]] = [
@@ -85,7 +85,7 @@ class Login(App):
         if info_names is not None: # update all usernames present
             names.append(pickle.loads(info_names))
 
-        # Lauches the main features
+        # Login page
         yield Vertical(Label("$$$$$$$\\  $$\\   $$\\ $$$$$$$\\   $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n$$  __$$\\ $$ |  $$ |$$  __$$\\ $$  __$$\\ $$  _____|\\__$$  __|\n$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ /  \\__|$$ |         $$ |\n$$$$$$$\\ |$$ |  $$ |$$ |  $$ |$$ |$$$$\\ $$$$$\\       $$ |\n$$  __$$\\ $$ |  $$ |$$ |  $$ |$$ |\\_$$ |$$  __|      $$ |\n$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |         $$ |\n$$$$$$$  |\\$$$$$$  |$$$$$$$  |\\$$$$$$  |$$$$$$$$\\    $$ |\n\\_______/  \\______/ \\_______/  \\______/ \\________|   \\__|", id = "title")
                        ,
             Vertical(
@@ -119,43 +119,47 @@ class Login(App):
             ),
             id = "login",
         )
+
+        # Second page
         yield Container(
-                    
-                    Horizontal(
+                Horizontal(
+                    Vertical(
                         Container(
                             RadioSet(
-                                RadioButton("Depot", id="d", value = True),
-                                RadioButton("Retrait", id="r"),
-                                RadioButton("Modifier", id="m"),
+                                RadioButton("Depot", id = "d", value = True), # A deposit is the default action
+                                RadioButton("Retrait", id = "r"),
+                                RadioButton("Modifier", id = "m"),
                                 id = "options"
+                                ),
+                            id = "menu",
                             ),
-                        id="menu",
-                        ),    
-                        Horizontal(
-                            Input(
-                                id="ID"
-                            ),
-                            Input(
-                                
-                            id="chiffre"  
-                            ),
-                            id="montant"
-                        ),
-                        id="top",
-                        ),
-                    Horizontal(
                         Container(
                             Label(""),
                             Label(""),
-                            id="info",
+                            id = "info",
+                            ),
+                        id = "left",
                         ),
+                    Vertical(
+                        Horizontal(
+                            Input(
+                                id = "ID"
+                                ),
+                            Input(   
+                                id = "chiffre"  
+                                ),
+                            id = "montant"
+                            ),
                         DataTable(
-                            id="table",
+                            id = "table",
+                            ),
+                        id = "right",
                         ),
-                        id="middle",
                     ),
-                    id="body",
-                ) 
+                id = "body",
+                )
+
+        # Initializing the state machine
         self.state = 0
 
     def on_mount(self)-> None:
@@ -269,14 +273,14 @@ class Login(App):
         self.username, self.pwd = self.query_one("#user", Input), self.query_one("#pwd", Input)
         
         if((self.username.is_valid)==False ):
-            self.username.border_title = "Sorry Username need to be longer than 5 characters"
-            self.username.add_class("invalid",update=True)
+            self.username.border_title = "Sorry Username needs to be longer than 5 characters"
+            self.username.add_class("invalid", update=True)
         else:
             self.username.remove_class("invalid",update=True)
             self.username.border_title = ""
         
         if((self.pwd.is_valid)==False ):
-            self.pwd.border_title = "Sorry Password need to be longer than 4 characters"
+            self.pwd.border_title = "Sorry Password need to be longer than 3 characters"
             self.pwd.add_class("invalid",update=True)
         else:
             self.pwd.remove_class("invalid",update=True)
@@ -297,18 +301,28 @@ class Login(App):
         elif self.state == 1: # Second page
             await self.second_page_treatment()
 
-    def on_button_pressed(self,event:Button.Pressed):
+    async def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
         global users, names,user
 
         if(button_pressed == "yes"):
+
+            # Obtenir les informations de l'utilisateur
             new_user = User((self.query_one("#user", Input).value),(self.query_one("#pwd", Input).value))
             user = new_user
+
+            # Sauvegarder l'utilisateur
             fichier.add_object_binary("users_list", (self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
             fichier.add_object_binary("names", (self.query_one("#user", Input).value))
             users.append((self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
-            names.append(self.query_one("#user", Input).value) 
-            self.connect(self.query_one("#user", Input).value,self.query_one("#pwd", Input).value)
+            names.append(self.query_one("#user", Input).value)
+
+            # Connecter l'utilisateur
+            await self.connect(self.query_one("#user", Input).value,self.query_one("#pwd", Input).value)
+
+            # Débuter la deuxième page
+            await self.second_page()
+
         elif(button_pressed == "no"):
             txt = self.query_one("#errorMessage")
             buttons = self.query_one("#buttonBox")
@@ -323,40 +337,6 @@ class Login(App):
             name.action_end()
             name.action_delete_left_all()
             name.action_home()
-
-            
-
-
-
-
-"""
-        # Get the wigets and input on the page
-        page = self.query_one("#page", Vertical)
-        inputs = self.query_one("#inputs", Horizontal)
-        messages = self.query_one("#messages", Vertical)
-
-        # Remove the messages
-        await messages.remove_children()
-
-        # Analyse the content present on the page
-        if self.username and self.pwd:
-            if self.username + self.pwd in users:
-                self.query_one("#page", Vertical).remove()
-                self.mount(Label("Bienvenue sur Finance Pro Max", id = "Budget")) # Label temporaire, ici, il faudra créer la page d'utilisation normale
-            elif self.username in names:
-                if self.try_pwd > 1:
-                    self.try_pwd -= 1
-                    messages.mount(Label(f"Mot de passe erroné, il reste {self.try_pwd} tentatives pour le mot de passe."))
-                else:
-                    messages.mount(Label("Entrée refusée"))
-            else:
-                 messages.mount(Vertical(Label("Voulez-vous créer cet utilisateur?"), Horizontal(Button("Oui"), Button("Non")), id = "Account_creation"))
-        elif self.username:
-            if self.username in names:
-                messages.mount(Label("Utilisateur existant, vous aurez 3 tentatives pour le mot de passe"))
-        else:
-            messages.mount(Label("Entrez un nom d'utilisateur"))
-               """ 
 
 # Global variables
 users:list = [] # Initializing the container for all users existant in te system
