@@ -6,7 +6,7 @@
  Name Of File : User.py
  Author : Thomas Raymond
  Author : Félix Roussin
- Date : 28 septembre 2026
+ Date : 5 septembre 2026
  
 Description  : Class for managing user's past sessions.
                 The Class is call from the frontend (UI) for saving info
@@ -73,7 +73,7 @@ class User:
         fichier.write_object_binary(self.key, {"transactions":self.transactions, "id":int, "column_format":self.column_format})
 
     # Methods related to its transactions
-    def add_transaction(self, transaction:Transaction) -> None:
+    def add_transaction(self,transaction:Transaction) -> None:
         """
         Method adding a transaction to the user
         """
@@ -89,25 +89,16 @@ class User:
             self.column_format["Date"] = max(self.column_format["Date"], len(str(transaction.date)) + 2)
         else:
             # Détruire la transaction
-            del transaction
- 
-    def get_depots(self) -> list:
-        """
-        Method getting all deposits
-        """
-        return [self.transactions[id] for id in self.transactions if self.transactions[id].get_montant() >= 0]
-    
-    def get_retraits(self):
-        """
-        Method getting all withdraws
-        """
-        return [self.transactions[id] for id in self.transactions if self.transactions[id].get_montant() < 0]
-        
+            del transaction\
+            
     def get_transactions(self):
         """
         Method getting all transactions of the user
         """
         return self.transactions
+
+    def get_last_transaction(self) -> Transaction:
+        return self.transactions[len(self.transactions) - 1]
 
     def validation_id_transaction(self, id_entre:str) -> bool:
         try:
@@ -135,38 +126,6 @@ class User:
 
     
 
-    # Methods related to the printing of the user's informations 
-    def print_historic(self)->str:
-        """
-        Method printing the historic of the user
-        """
-        # Create the string to print
-        historic_widget:str = f""
-
-        # Adding to the string, if there are, all transactions
-        if len(self.transactions) > 0:
-            #historic_widget += "Votre historique :\n"
-
-            # Adding to the string, if there are, all deposits
-            depots:list = self.get_depots()
-            if len(depots) != 0:
-               # historic_widget += "Vos dépôts: \n"
-                historic_widget += f"{'ID':^{self.column_format['ID']}}{'Raison':^{self.column_format['Raison']}}{'Montant':^{self.column_format['Montant']}}{'Date':^{self.column_format['Date']}}\n"
-                for i in depots:
-                    historic_widget += (f"{i.get_id():^{self.column_format['ID']}}{i.get_raison():^{self.column_format['Raison']}}{i.get_montant():^{self.column_format['Montant']}.2f}{str(i.get_date()):^{self.column_format['Date']}}")
-                    historic_widget += "\n"
-            
-            # Adding to the string, if there are, all withdraws
-            retraits:list = self.get_retraits()
-            if len(retraits) != 0:
-               # historic_widget += "\nVos retraits: \n"
-                historic_widget += f"{'ID':^{self.column_format['ID']}}{'Raison':^{self.column_format['Raison']}}{'Montant':^{self.column_format['Montant']}}{'Date':^{self.column_format['Date']}}\n"
-                for i in retraits:
-                    historic_widget += (f"{i.get_id():^{self.column_format['ID']}}{i.get_raison():^{self.column_format['Raison']}}{i. get_montant():^{self.column_format['Montant']}.2f}{str(i.get_date()):^{self.column_format['Date']}}")
-                    historic_widget += "\n"
-
-        return historic_widget
-    
     
     def __str__(self) -> str:
         """

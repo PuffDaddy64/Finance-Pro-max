@@ -5,7 +5,7 @@
  Name Of File : Transaction.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 28 septembre 2026
+ Date : 27 août 2026
  
 Description  : Class describing a transaction.
                The class is called from the User module to manage the information related to a particular transaction.
@@ -18,7 +18,7 @@ class Transaction:
 
     ID = 0
 
-    def __init__(self, choix:str, raison:str, montant:str) -> None:
+    def __init__(self,choix:int, raison:str, montant:float) -> None:
          """
              Initialize values
          """ 
@@ -66,12 +66,6 @@ class Transaction:
         """
         return self.raison
 
-    def modify_raison(self, new_reason:str) -> None:
-        """
-        Method modifying the reason of a transaction
-        """
-        self.raison = new_reason
-
 # Methods related to the amount of the transaction
     def validation_montant(self, montant_entre:str) -> bool:
          """
@@ -114,9 +108,6 @@ class Transaction:
         """
         return self.montant
 
-    def modify_montant(self, new_montant:float) -> None:
-        self.montant = new_montant
-
  # Methods related to the date ofthe transaction
     def set_date(self) -> None:
         self.date:datetime.date = datetime.datetime.now().date()
@@ -127,63 +118,9 @@ class Transaction:
         """
         return self.date
 
-    def validation_year(self, new_year:str) -> bool:
-        try:
-            year = int(new_year)
-        except ValueError:
-            print(f"La valeur entrée pour l'année n'est pas un nombre.")
-            return False
-        if year < 0 and year >= 9999: # Le 9999 provient d'une contrainte datetime.date
-            print(f"Veuillez entrer une année supérieure à 0 et inférieure à 9999")
-            return False
-        return True
-
-    def validation_month(self, new_month:str) -> bool:
-            try:
-                month = int(new_month)
-            except ValueError:
-                print(f"La valeur entrée pour le mois n'est pas un nombre.")
-                return False
-            if month < 1 or month > 12:
-                print(f"Veuillez entrer un mois de 1 à 12")
-                return False
-            return True
-
-    def validation_day(self, new_day:str) -> bool:
-        try:
-            day = int(new_day)
-        except ValueError:
-            print(f"La valeur entrée pour le jour n'est pas un nombre.")
-            t.sleep(1)
-            return False
-        if day < 1 or day > 31:
-            print(f"Veuillez entrer un jour de 1 à 31")
-            t.sleep(1)
-            return False
-        return True
-
-    def modify_date(self, new_year:int, new_month:int, new_day:int) -> None:
-        self.date = datetime.date(year = int(new_year), month = int(new_month), day = int(new_day))
-
 # Methods related to the transaction type
-    def get_type(self) -> str:
-        """
-        Method acquiring the type of the transaction (Deposit(d) or Withdraw(r))
-        """
-        if self.get_montant() > 0:
-            return "d"
-        else:
-            return "r"
-
-    def modify_type(self, new_type:str) -> None:
-        """
-        Method to modify the type of a transaction
-        """
-        if new_type == "d" and self.get_type() == "r":
-            self.montant *= -1
-        elif new_type == "r" and self.get_type() == "d":
-            self.montant *= -1
  
+
     # Method regrouping the completion of a validation
     def valid_transaction(self):
         """
@@ -203,6 +140,11 @@ class Transaction:
         widget += f"{self.get_id():^{format['ID']}}{self.get_raison():^{format['Raison']}}{self.get_montant():^{format['Montant']}.2f}{str(self.get_date()):^{format['Date']}}"
 
         print(widget)
+
+    def change_transaction(self, new_raison:str, new_montant:float,new_choix:str) -> None:
+        if(new_raison != None):
+            self.set_raison(raison = new_raison)
+        self.set_montant(new_montant, new_choix)
 
     # Methods related to the modification of a transaction
     def modify(self):

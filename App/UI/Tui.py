@@ -4,7 +4,7 @@
  Name Of File : TUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 28 septembre 2026
+ Date : 24 septembre 2026
 
 Description : UI handler whic appearsin the terminal. This UI is built with a library called Textual.
 """
@@ -63,14 +63,28 @@ class Login(App):
     try_pwd:int = 3 # 3 tries for the pwd
 
     # Path related to the CSS file wich determines the format appearance of each widget represented in that file
-    CSS_PATH = "TCSS/login.tcss"
+    CSS_PATH="TCSS/login.tcss"
 
 
     BINDINGS: ClassVar[list[Binding]] = [
         Binding("ctrl+q", "save_and_quit", "Quit", show = True, priority = True),
     ]
+
+###########################   Bindings Method   ############################
+
+
+    def action_save_and_quit(self):
+        global user
+        if user != None:
+            user.save_info()
+        self.exit()
+
+
+###################################################################################
+
+###########################   Compose Method (Event)   ############################
     
-    # Methods related to the App apperance
+
     def compose(self) -> ComposeResult:
         """
         Method related to the lauch of the App
@@ -88,7 +102,7 @@ class Login(App):
         if info_names is not None: # update all usernames present
             names.append(pickle.loads(info_names))
 
-        # Login page
+        # Lauches the main features
         yield Vertical(Label("$$$$$$$\\  $$\\   $$\\ $$$$$$$\\   $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n$$  __$$\\ $$ |  $$ |$$  __$$\\ $$  __$$\\ $$  _____|\\__$$  __|\n$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ /  \\__|$$ |         $$ |\n$$$$$$$\\ |$$ |  $$ |$$ |  $$ |$$ |$$$$\\ $$$$$\\       $$ |\n$$  __$$\\ $$ |  $$ |$$ |  $$ |$$ |\\_$$ |$$  __|      $$ |\n$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |         $$ |\n$$$$$$$  |\\$$$$$$  |$$$$$$$  |\\$$$$$$  |$$$$$$$$\\    $$ |\n\\_______/  \\______/ \\_______/  \\______/ \\________|   \\__|", id = "title")
                        ,
             Vertical(
@@ -122,112 +136,63 @@ class Login(App):
             ),
             id = "login",
         )
-
-        # Second page
         yield Container(
-                Horizontal(
-                    Vertical(
+                    
+                    Horizontal(
                         Container(
                             RadioSet(
-                                RadioButton("Depot", id = "d", value = True), # A deposit is the default action
-                                RadioButton("Retrait", id = "r"),
-                                RadioButton("Modifier", id = "m"),
+                                RadioButton("Depot", id="d", value = True),
+                                RadioButton("Retrait", id="r"),
+                                RadioButton("Modifier", id="m"),
                                 id = "options"
-                                ),
-                            id="menu",
                             ),
+                        id="menu",
+                        ),    
+                        Horizontal(
+                            Input(
+                                type="integer",
+                                id="ID",
+                                classes="no_display"
+                            ),
+                            Input(
+                                type="number",
+                                id="chiffre"
+                            ),
+                            Input(
+                                type="text",
+                                id="raison"
+                            ),
+                            id="montant"
+                        ),
+                        id="top",
+                        ),
+                    Horizontal(
                         Container(
                             Label(""),
                             Label(""),
-                            id = "info"
-                            ),
-                        id = "left"
+                            id="info",
                         ),
-                    Vertical(
-                        Horizontal(
-                            Input(
-                                id="ID",
-                                classes="no_display"
-                                ),
-                            Input(   
-                                type="number",
-                                id="chiffre" 
-                                ),
-                            id = "montant"
-                            ),
                         DataTable(
-                            id = "table",
-                            ),
-                        id = "right",
+                            id="table",
                         ),
+                        id="middle",
                     ),
-                id = "body",
-                )
-
-        # Initializing the state machine
+                    id="body",
+                ) 
         self.state = 0
 
-    def on_mount(self)-> None:
-        """
-        Method called when a mount function is called
-        """
-        global user
-        user = None
-        self.query_one("#body").display = False
-        # Username
-        inputUsername = self.query_one('#user', Input) 
-        inputUsername.border_subtitle = "Username"
 
-        # Password
-        inputPassword = self.query_one('#pwd', Input) 
-        inputPassword.border_subtitle = "Password"
+###################################################################################
 
-    def make_rows(self, user:User):
-        """
-        Method to make the rows of the table
-        """
-        historic_transactions = user.get_transactions()
-        formated_transactions = [("ID", "Raison", "Montant", "Date")]
-        for transaction in historic_transactions:
-            formated_transactions.append((str(transaction), str(historic_transactions[transaction].get_raison()) , str(historic_transactions[transaction].get_montant()), str(historic_transactions[transaction].get_date())))
-        return formated_transactions
 
+
+
+###########################   User Method  ############################
 
 
     def activate_user(self, username:str, pwd:str):
         global user
         user = User(username, pwd)
-
-    def second_page(self):
-        """
-        Method to display the second page of the app
-        """
-        global user
-        ROWS = []
-        self.query_one("#body").display = True
-        ROWS = self.make_rows(user)
-        table_transactions = self.query_one("#table", DataTable)
-        table_transactions.clear(columns = True)
-        table_transactions.add_columns(*ROWS[0])
-        table_transactions.add_rows(ROWS[1:])
-        labels = self.query_one( "#info")
-        labels.remove_children()
-        labels.mount(Label(user.get_name()))
-        labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
-        
-
-
-    def action_save_and_quit(self):
-        global user
-        if user != None:
-            user.save_info()
-        self.exit()
-
-
-
-
-
-
 
     def connect(self, username:str , pwd:str) -> None:
         """
@@ -270,54 +235,6 @@ class Login(App):
             butttonBox.mount(Button("OUI",id="yes",))
             butttonBox.mount(Button("NON",id="no",))
 
-    def make_row(self,transaction:Transaction):
-        table_transactions = self.query_one("#table", DataTable)
-        table_transactions.add_row(str(transaction.get_id()),transaction.get_raison(),transaction.get_montant(),str(transaction.get_date()))
-
-
-    async def second_page_treatment(self):
-        global user
-        montant = self.query_one("#chiffre", Input).value
-        if user is not None:
-            menu = self.query_one("#options", RadioSet)
-            choix = menu.pressed_button
-            new_transaction = Transaction(montant = montant, choix = choix.id, raison="Test")
-            user.add_transaction(new_transaction)
-            self.make_row(new_transaction)
-            self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
-            user.save_info()
-            
-        else:
-            raise ValueError("The user hasn't been set and we are yet on second page")
-
-    
-    def login_page_treatment(self):
-        """Method treating the information entered on the login page"""             
-        # Get the information entred
-        self.username, self.pwd = self.query_one("#user", Input), self.query_one("#pwd", Input)
-        
-        if((self.username.is_valid)==False ):
-            self.username.border_title = "Sorry Username needs to be longer than 5 characters"
-            self.username.add_class("invalid", update=True)
-        else:
-            self.username.remove_class("invalid",update=True)
-            self.username.border_title = ""
-        
-        if((self.pwd.is_valid)==False ):
-            self.pwd.border_title = "Sorry Password need to be longer than 3 characters"
-            self.pwd.add_class("invalid",update=True)
-        else:
-            self.pwd.remove_class("invalid",update=True)
-            self.pwd.border_title = ""
-        
-        if((self.username.is_valid) and (self.pwd.is_valid)):
-            self.connect(self.username.value, self.pwd.value)
-
-
-
-
-
-
     def makeUser(self):
         global users, names,user
         new_user = User((self.query_one("#user", Input).value),(self.query_one("#pwd", Input).value))
@@ -329,36 +246,200 @@ class Login(App):
         self.connect(self.query_one("#user", Input).value,self.query_one("#pwd", Input).value)
 
 
+###################################################################################
 
 
 
 
+
+###########################   DATA TABLE Methods   ############################
+
+
+    def make_rows(self, user:User):
+        """
+        Method to make the rows of the table
+        """
+        table_transactions = self.query_one("#table", DataTable)
+        table_transactions.add_column("ID",key="id")
+        table_transactions.add_column("Raison",key="raison")
+        table_transactions.add_column("Montant",key="montant")
+        table_transactions.add_column("Date",key="date")
+        historic_transactions = user.get_transactions()
+        for transaction in historic_transactions:
+            table_transactions.add_row(str(transaction), str(historic_transactions[transaction].get_raison()) , str(historic_transactions[transaction].get_montant()), str(historic_transactions[transaction].get_date()),key=str(historic_transactions[transaction].get_id()))
+
+    def make_row(self,transaction:Transaction):
+        table_transactions = self.query_one("#table", DataTable)
+        table_transactions.add_row(str(transaction.get_id()),transaction.get_raison(),transaction.get_montant(),str(transaction.get_date()),key=str(transaction.get_id()))
+
+    def changes_cells(self,transaction:Transaction):
+        table_transactions = self.query_one("#table", DataTable)
+        table_transactions.update_cell(str(transaction.get_id()),"raison", transaction.get_raison())
+        table_transactions.update_cell(str(transaction.get_id()), "montant", transaction.get_montant())
+
+    async def add_transaction(self):
+        global user
+        montant = self.query_one("#chiffre", Input)
+        raison = self.query_one("#raison", Input)
+        raison_value = raison.value if raison.value != "" else "Aucune raison"
+        if user is not None:
+            menu = self.query_one("#options", RadioSet)
+            choix = menu.pressed_button
+            new_transaction = Transaction(montant= montant.value,choix=choix.id,raison = raison_value )
+            user.add_transaction(new_transaction)
+            self.make_row(new_transaction)
+            self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
+            user.save_info()
+            raison.action_end()
+            raison.action_delete_left_all()
+            montant.action_end()
+            montant.action_delete_left_all()
             
 
-    # Methods related to the reaction to user's inputs
+            
+        else:
+            raise ValueError("The user hasn't been set and we are yet on second page")
+
+    async def modify_transaction(self):
+        global user
+        montant = self.query_one("#chiffre", Input)
+        raison = self.query_one("#raison", Input)
+        raison_value = raison.value if raison.value != "" else None
+        id_transaction = self.query_one("#ID", Input)
+        if user is not None:
+            if int(id_transaction.value) <= user.get_last_transaction().get_id() and int(id_transaction.value) >= 0:
+                choix = "d" if int(montant.value) >= 0 else "r"
+                if choix == "r":
+                    montant.value = str(abs(float(montant.value)))
+                transaction_to_modify = user.get_transactions()[int(id_transaction.value)]
+                transaction_to_modify.change_transaction(new_raison=raison_value,new_montant=montant.value,new_choix=choix)
+                user.save_info()
+                self.changes_cells(transaction_to_modify)
+                self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
+                raison.action_end()
+                raison.action_delete_left_all()
+                montant.action_end()
+                montant.action_delete_left_all()
+                if(id_transaction.has_class("invalid")):
+                    id_transaction = self.query_one('#ID', Input)
+                    id_transaction.border_subtitle = "ID"
+                    id_transaction.remove_class("invalid",update=True)
+                id_transaction.action_end()
+                id_transaction.action_delete_left_all() 
+            else:
+                id_transaction.border_subtitle = "ID (Invalid ID)"
+                id_transaction.add_class("invalid",update=True)
+
+        else:
+         raise ValueError("The user hasn't been set and we are yet on second page")
+
+
+###################################################################################
+
+
+
+
+
+
+###########################   Stage the page method  ############################
+
+
+    def on_mount(self)-> None:
+        """
+        Method called when a mount function is called
+        """
+        global user
+        user = None
+        self.query_one("#body").display = False
+        # Username
+        inputUsername = self.query_one('#user', Input) 
+        inputUsername.border_subtitle = "Username"
+
+        # Password
+        inputPassword = self.query_one('#pwd', Input) 
+        inputPassword.border_subtitle = "Password"
+  
+    def login_page_treatment(self):
+        """Method treating the information entered on the login page"""             
+        # Get the information entred
+        self.username, self.pwd = self.query_one("#user", Input), self.query_one("#pwd", Input)
+        
+        if((self.username.is_valid)==False ):
+            self.username.border_title = "Sorry Username need to be longer than 5 characters"
+            self.username.add_class("invalid",update=True)
+        else:
+            self.username.remove_class("invalid",update=True)
+            self.username.border_title = ""
+        
+        if((self.pwd.is_valid)==False ):
+            self.pwd.border_title = "Sorry Password need to be longer than 4 characters"
+            self.pwd.add_class("invalid",update=True)
+        else:
+            self.pwd.remove_class("invalid",update=True)
+            self.pwd.border_title = ""
+        
+        if((self.username.is_valid) and (self.pwd.is_valid)):
+            self.connect(self.username.value, self.pwd.value)
+
+    def second_page(self):
+        """
+        Method to display the second page of the app
+        """
+        global user
+        
+        self.query_one("#body").display = True
+        self.make_rows(user)
+        labels = self.query_one( "#info")
+        labels.remove_children()
+        labels.mount(Label(user.get_name()))
+        labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
+        # Username
+        inputChiffre = self.query_one('#chiffre', Input) 
+        inputChiffre.border_subtitle = "Montant"
+
+        # Passwordv
+        inputRaison = self.query_one('#raison', Input) 
+        inputRaison.border_subtitle = "Raison"
+        inputID = self.query_one('#ID', Input) 
+        inputID.border_subtitle = "ID"
+
+        
+###################################################################################
+
+
+
+
+
+
+
+
+
+###########################   ON_ Method (Event)   ############################
+
+
     async def on_input_submitted(self, event: Input.Submitted):
         """
         Method called by textual when the enter key is pushed on an input
         """
-        if self.state == 0: # Login page
+        input_id = str(event.control.id)
+        if input_id == "user" or input_id == "pwd": # Login page
             self.login_page_treatment()
 
-        elif self.state == 1: # Second page
-            await self.second_page_treatment()
+        elif (event.control.id == "chiffre" or event.control.id == "raison" or event.control.id == "ID") and self.query_one("#ID",Input).display == False : # Second page
+            await self.add_transaction()
+        elif self.query_one("#ID",Input).display == True and (self.query_one("#chiffre",Input).value != "" or self.query_one("#ID",Input).value != ""):
+            await self.modify_transaction()
 
-
-
-#TODO : Change the way it work to make it modify (I got an idea.)
     def on_radio_set_changed(self, event:RadioSet.Changed):
         radio_button = event.pressed
         if radio_button.id == "m":
             self.query_one("#ID",Input).display = True
+            self.query_one("#chiffre",Input).styles.max_width = '40%'
+            self.query_one("#raison",Input).styles.max_width = '40%'
         else:
             self.query_one("#ID",Input).display = False
-
-
-
-            
+            self.query_one("#chiffre",Input).styles.max_width = '50%'
+            self.query_one("#raison",Input).styles.max_width = '50%'
 
     def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
@@ -380,6 +461,12 @@ class Login(App):
             name.action_end()
             name.action_delete_left_all()
             name.action_home()
+
+
+###################################################################################
+            
+
+
 
 # Global variables
 users:list = [] # Initializing the container for all users existant in te system
