@@ -2,7 +2,34 @@
  
  Screen{
      align: center middle;
+           
 }
+
+
+
+ Input{
+    background:white 0%;
+    border: dashed #ffcc00 20%;
+    tint: #267326 5%;
+    border-subtitle-color: #cccc00 75%;
+            
+    }
+    Input:focus{
+        border: dashed #ffcc00 50%;
+        background: yellow 15%;
+    }
+
+    Input.invalid:focus{
+        border-title-color:  #ff3c00 75%;
+        background: #ff3c00 5%;	
+        border: dashed #ff3c00 50%;
+
+
+    }
+    Input.invalid{
+        border: dashed #ff3c00 20%;
+        border-title-color:  #ff3c00 50%;
+    }
 
 
 
@@ -30,29 +57,7 @@
 			padding:1;
 			height: auto;
 
-			Input{
-				background:white 0%;
-				border: dashed #ffcc00 20%;
-				tint: #267326 5%;
-				border-subtitle-color: #cccc00 75%;
-					
-			}
-			Input:focus{
-				border: dashed #ffcc00 50%;
-				background: yellow 15%;
-			}
-
-			Input.invalid:focus{
-				border-title-color:  #ff3c00 75%;
-				background: #ff3c00 5%;	
-				border: dashed #ff3c00 50%;
-
-
-			}
-			Input.invalid{
-				border: dashed #ff3c00 20%;
-				border-title-color:  #ff3c00 50%;
-			}
+			
 		}
 		
 
@@ -98,10 +103,7 @@
 
 
 	}
-	.invalid{
-		border: dashed #ff3c00 20%;
-		background: #ff3c00 5%;
-	}
+	
 }
 
 
@@ -118,26 +120,12 @@
         padding: 0;
 
         #menu{
-
-            height: 15%;
-            width: 100%;
+           
+            height: 100%;
+            width: 20%;
             padding: 0;
-
-            #options {
-
-                height: 100%;
-                width: 100%;
-                padding: 0;
-
-                }
-            }
-
-        #info{
-            height: 85%;
-            width: 100%;
-            margin: 1;
-            }
         }
+<<<<<<< HEAD
         
     #right{
 
@@ -184,6 +172,46 @@
         #table{
             height: 70%;
             width: 100%;
+=======
+        #montant{
+           
+            height: 50%;
+            width: 80%;
+            
+            #chiffre{
+                height: 100%;
+                max-width: 50%;
+
+            }
+            #ID{
+                height: 100%;
+                width: 20%;
+                display: none;
+            }
+      
+            #raison{
+                height:100%;
+                max-width: 50%;
+            }
+            
+
+>>>>>>> 070115e16df577bf062a16053ff37326a2fb4a53
+        }
+    }
+        
+    #middle{
+        height: 80%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        #info{
+            height: 100%;
+            width: 20%;
+            margin: 1;
+        }
+        #table{
+            height: 100%;
+            width: 80%;
         }
     }
 }
