@@ -90,7 +90,7 @@ class Login(App):
         Method related to the lauch of the App
         """
         # Calling global variables useful in the function
-        global users, names,user
+        global users, names, user
         
         # Reading users et usernames files to be able to verify in the inputs corresponds to an exxisting user
         info_users = fichier.read_content("users_list")
@@ -136,6 +136,7 @@ class Login(App):
             ),
             id = "login",
         )
+
         yield Container(
                     
                     Horizontal(
@@ -268,9 +269,9 @@ class Login(App):
         for transaction in historic_transactions:
             table_transactions.add_row(str(transaction), str(historic_transactions[transaction].get_raison()) , str(historic_transactions[transaction].get_montant()), str(historic_transactions[transaction].get_date()),key=str(historic_transactions[transaction].get_id()))
 
-    def make_row(self,transaction:Transaction):
+    def make_row(self, transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
-        table_transactions.add_row(str(transaction.get_id()),transaction.get_raison(),transaction.get_montant(),str(transaction.get_date()),key=str(transaction.get_id()))
+        table_transactions.add_row(str(transaction.get_id()), transaction.get_raison(), transaction.get_montant(), str(transaction.get_date()), key=str(transaction.get_id()))
 
     def changes_cells(self,transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
@@ -285,7 +286,7 @@ class Login(App):
         if user is not None:
             menu = self.query_one("#options", RadioSet)
             choix = menu.pressed_button
-            new_transaction = Transaction(montant= montant.value,choix=choix.id,raison = raison_value )
+            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value )
             user.add_transaction(new_transaction)
             self.make_row(new_transaction)
             self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
@@ -393,13 +394,16 @@ class Login(App):
         labels.remove_children()
         labels.mount(Label(user.get_name()))
         labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
-        # Username
+
+        # Montant
         inputChiffre = self.query_one('#chiffre', Input) 
         inputChiffre.border_subtitle = "Montant"
 
-        # Passwordv
+        # Raison
         inputRaison = self.query_one('#raison', Input) 
         inputRaison.border_subtitle = "Raison"
+
+        # ID
         inputID = self.query_one('#ID', Input) 
         inputID.border_subtitle = "ID"
 

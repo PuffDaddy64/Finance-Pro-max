@@ -112,10 +112,10 @@
     height: 100%;
     width: 100%;
     
-    #left{
+    #top{
 
-        height: 100%;
-        width: 30%;
+        height: 30%;
+        width: 100%;
         margin: 0;
         padding: 0;
 
@@ -125,54 +125,7 @@
             width: 20%;
             padding: 0;
         }
-<<<<<<< HEAD
-        
-    #right{
 
-        height: 100%;
-        width: 70%;
-        margin: 0;
-        padding: 0;
-
-		#inputs{
-
-			height: 30%;
-			width: 100%;
-		
-			#montant{
-
-				height: 50%;
-				width: 100%;
-
-				Input{
-					background:white 0%;
-					border: dashed #ffcc00 20%;
-					tint: #267326 5%;
-					border-subtitle-color: #cccc00 75%;
-					}
-				
-				#chiffre{
-					height: 100%;
-					width: 100%;
-					}
-
-				#ID{
-					height: 100%;
-					width: 20%;
-					display: none;
-					}
-        		}
-			
-			#raison{
-				height: 50%;
-				width: 100%;
-				}
-			}
-        
-        #table{
-            height: 70%;
-            width: 100%;
-=======
         #montant{
            
             height: 50%;
@@ -195,12 +148,11 @@
             }
             
 
->>>>>>> 070115e16df577bf062a16053ff37326a2fb4a53
         }
     }
         
     #middle{
-        height: 80%;
+        height: 70%;
         width: 100%;
         margin: 0;
         padding: 0;
