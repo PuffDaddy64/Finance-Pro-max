@@ -17,11 +17,13 @@ import time
 
 from textual import on
 from textual.app import App,ComposeResult
-from textual.containers import Center, Container, Horizontal, Middle,Vertical
-from textual.widgets import DataTable, Header, Footer, Button, Input, Label,Pretty, RadioButton, RadioSet
-from textual.validation import Length, Validator
+from textual.containers import  Container, Horizontal, Vertical
+from textual.widgets import DataTable, Header, Footer, Button, Input, Label, RadioButton, RadioSet
+from textual.validation import Length
 from textual.binding import Binding
+from rich.text import Text
 from typing import ClassVar
+
 
 
 # Import from SimpleUI which is the old UI
@@ -162,15 +164,26 @@ class Login(App):
                                 type="text",
                                 id="raison"
                             ),
-                            id="montant"
+                            Input(
+                                type="text",
+                                id="date",
+                            ),
+                            Input(
+                                type="text",
+                                id="categorie",
+                            ),
+                            id="montant",
                         ),
                         id="top",
                         ),
                     Horizontal(
-                        Container(
-                            Label(""),
-                            Label(""),
+                        Vertical(
+                            Container(
+                                Label(""),
+                                Label(""),
                             id="info",
+                            ),
+                            id="left"
                         ),
                         DataTable(
                             id="table",
@@ -255,10 +268,29 @@ class Login(App):
 ###########################   DATA TABLE Methods   ############################
 
 
+    def style_ROW(self, ROW: list[str], transaction:Transaction) -> list[Text]:
+        """
+        Method to style a row of the table
+        """
+        #Pour le montant
+        style_montant = "#53C88B" if transaction.get_montant() >= 0 else "#D9AD54"
+        style_texte = "#D2D5CC"
+        style_ROW = []
+        for cells in ROW:
+            if cells == str(transaction.get_montant()):
+                style_ROW.append(Text(cells,style=style_montant))           
+            else:
+                style_ROW.append(Text(cells,style=style_texte))           
+            
+        return style_ROW
+                
+
+
     def make_rows(self, user:User):
         """
         Method to make the rows of the table
         """
+
         table_transactions = self.query_one("#table", DataTable)
         table_transactions.add_column("ID",key="id")
         table_transactions.add_column("Raison",key="raison")
@@ -266,16 +298,21 @@ class Login(App):
         table_transactions.add_column("Date",key="date")
         historic_transactions = user.get_transactions()
         for transaction in historic_transactions:
-            table_transactions.add_row(str(transaction), str(historic_transactions[transaction].get_raison()) , str(historic_transactions[transaction].get_montant()), str(historic_transactions[transaction].get_date()),key=str(historic_transactions[transaction].get_id()))
+            ROW = [str(transaction), str(historic_transactions[transaction].get_raison()) , str(historic_transactions[transaction].get_montant()), str(historic_transactions[transaction].get_date())] 
+            style_ROW = self.style_ROW(ROW, historic_transactions[transaction])
+            table_transactions.add_row(*(style_ROW),key=str(historic_transactions[transaction].get_id()))
 
     def make_row(self,transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
-        table_transactions.add_row(str(transaction.get_id()),transaction.get_raison(),transaction.get_montant(),str(transaction.get_date()),key=str(transaction.get_id()))
+        ROW = [str(transaction.get_id()),str(transaction.get_raison()) , str(transaction.get_montant()), str(transaction.get_date())]
+        style_ROW = self.style_ROW(ROW, transaction)
+        table_transactions.add_row(*style_ROW,key=str(transaction.get_id()))
 
     def changes_cells(self,transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
-        table_transactions.update_cell(str(transaction.get_id()),"raison", transaction.get_raison())
-        table_transactions.update_cell(str(transaction.get_id()), "montant", transaction.get_montant())
+        style = "#53C88B" if transaction.get_montant() >= 0 else "#D9AD54"
+        table_transactions.update_cell(str(transaction.get_id()),"raison", Text(str(transaction.get_raison())))
+        table_transactions.update_cell(str(transaction.get_id()), "montant", Text(str(transaction.get_montant()),style=style))
 
     async def add_transaction(self):
         global user
@@ -393,15 +430,28 @@ class Login(App):
         labels.remove_children()
         labels.mount(Label(user.get_name()))
         labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
-        # Username
+        # Montant 
         inputChiffre = self.query_one('#chiffre', Input) 
         inputChiffre.border_subtitle = "Montant"
 
-        # Passwordv
+        # Raison
         inputRaison = self.query_one('#raison', Input) 
         inputRaison.border_subtitle = "Raison"
+        
+        # ID
         inputID = self.query_one('#ID', Input) 
         inputID.border_subtitle = "ID"
+
+        #DATE
+        inputDate = self.query_one('#date', Input)
+        inputDate.border_subtitle = "Date"
+
+        #categorie
+        inputCategorie = self.query_one('#categorie', Input)
+        inputCategorie.border_subtitle = "Categorie"
+
+
+
 
         
 ###################################################################################
@@ -434,12 +484,16 @@ class Login(App):
         radio_button = event.pressed
         if radio_button.id == "m":
             self.query_one("#ID",Input).display = True
-            self.query_one("#chiffre",Input).styles.max_width = '40%'
-            self.query_one("#raison",Input).styles.max_width = '40%'
+            self.query_one("#chiffre",Input).styles.max_width = '20%'
+            self.query_one("#raison",Input).styles.max_width = '20%'
+            self.query_one("#date",Input).styles.max_width = '20%'
+            self.query_one("#categorie",Input).styles.max_width = '20%'
         else:
             self.query_one("#ID",Input).display = False
-            self.query_one("#chiffre",Input).styles.max_width = '50%'
-            self.query_one("#raison",Input).styles.max_width = '50%'
+            self.query_one("#chiffre",Input).styles.max_width = '25%'
+            self.query_one("#raison",Input).styles.max_width = '25%'
+            self.query_one("#date",Input).styles.max_width = '25%'
+            self.query_one("#categorie",Input).styles.max_width = '25%'
 
     def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
