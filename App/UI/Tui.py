@@ -66,7 +66,7 @@ class Login(App):
     CSS_PATH = "TCSS/login.tcss"
 
 
-    BINDINGS: ClassVar[list[Binding]] = [
+    BINDINGS: ClassVar[list[Binding]] = [ # type: ignore[override] # Ne pas enlever le commentaire, il retire une erreur relié à un override volontaire de notre part sur BINDINGS
         Binding("ctrl+q", "save_and_quit", "Quit", show = True, priority = True),
     ]
     
@@ -144,24 +144,32 @@ class Login(App):
                         id = "left"
                         ),
                     Vertical(
-                        Horizontal(
-                            Input(
-                                id="ID",
-                                classes="no_display"
+                        Container(
+                            Vertical(
+                                Horizontal(
+                                    Input(
+                                        id = "ID",
+                                        classes = "no_display"
+                                        ),
+                                    Input(   
+                                        type = "number",
+                                        id = "chiffre" 
+                                        ),
+                                    id = "montant"
+                                    ),
+                                Input(
+                                    id = "raison"
+                                    ),
+                                id = "inputs"
                                 ),
-                            Input(   
-                                type="number",
-                                id="chiffre" 
+                            DataTable(
+                                id = "table",
                                 ),
-                            id = "montant"
+                            id = "right",
                             ),
-                        DataTable(
-                            id = "table",
-                            ),
-                        id = "right",
                         ),
                     ),
-                id = "body",
+                id = "body"
                 )
 
         # Initializing the state machine
@@ -205,15 +213,16 @@ class Login(App):
         global user
         ROWS = []
         self.query_one("#body").display = True
-        ROWS = self.make_rows(user)
-        table_transactions = self.query_one("#table", DataTable)
-        table_transactions.clear(columns = True)
-        table_transactions.add_columns(*ROWS[0])
-        table_transactions.add_rows(ROWS[1:])
-        labels = self.query_one( "#info")
-        labels.remove_children()
-        labels.mount(Label(user.get_name()))
-        labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
+        if user is not None:
+            ROWS = self.make_rows(user)
+            table_transactions = self.query_one("#table", DataTable)
+            table_transactions.clear(columns = True)
+            table_transactions.add_columns(*ROWS[0])
+            table_transactions.add_rows(ROWS[1:])
+            labels = self.query_one( "#info")
+            labels.remove_children()
+            labels.mount(Label(user.get_name()))
+            labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
         
 
 
@@ -281,11 +290,13 @@ class Login(App):
         if user is not None:
             menu = self.query_one("#options", RadioSet)
             choix = menu.pressed_button
-            new_transaction = Transaction(montant = montant, choix = choix.id, raison="Test")
-            user.add_transaction(new_transaction)
-            self.make_row(new_transaction)
-            self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
-            user.save_info()
+            if choix is not None:
+                if choix.id is not None:
+                    new_transaction = Transaction(montant = montant, choix = choix.id, raison="Test")
+                    user.add_transaction(new_transaction)
+                    self.make_row(new_transaction)
+                    self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
+                    user.save_info()
             
         else:
             raise ValueError("The user hasn't been set and we are yet on second page")

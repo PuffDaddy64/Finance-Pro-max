@@ -146,31 +146,43 @@
         margin: 0;
         padding: 0;
 
-        #montant{
+		#inputs{
 
-            height: 15%;
-            width: 100%;
+			height: 30%;
+			width: 100%;
+		
+			#montant{
 
-            Input{
-                background:white 0%;
-                border: dashed #ffcc00 20%;
-                tint: #267326 5%;
-                border-subtitle-color: #cccc00 75%;
-                }
-            
-            #chiffre{
-                height: 100%;
-                width: 100%;
-                }
-            #ID{
-                height: 100%;
-                width: 20%;
-                display: none;
-            }
-        }
+				height: 50%;
+				width: 100%;
+
+				Input{
+					background:white 0%;
+					border: dashed #ffcc00 20%;
+					tint: #267326 5%;
+					border-subtitle-color: #cccc00 75%;
+					}
+				
+				#chiffre{
+					height: 100%;
+					width: 100%;
+					}
+
+				#ID{
+					height: 100%;
+					width: 20%;
+					display: none;
+					}
+        		}
+			
+			#raison{
+				height: 50%;
+				width: 100%;
+				}
+			}
         
         #table{
-            height: 85%;
+            height: 70%;
             width: 100%;
         }
     }

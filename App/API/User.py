@@ -20,7 +20,7 @@ import time as t
 
 def prRed(s): return "\033[91m{}\033[00m".format(s)
 def prGreen(s): return "\033[92m{}\033[00m".format(s)
- 
+
 class User:
     def __init__(self, name:str, pwd: str) -> None:
             self.name:str = name
