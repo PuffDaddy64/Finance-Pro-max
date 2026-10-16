@@ -110,21 +110,28 @@ $ErrorColor: #D94F83;
 
 
 #body{
+
     height: 100%;
     width: 100%;
     
-
     #top{
+<<<<<<< HEAD
         height: 12%;
+=======
+
+        height: 30%;
+>>>>>>> refs/remotes/origin/main
         width: 100%;
         margin: 0;
         padding: 0;
+
         #menu{
            
             height: 100%;
             width: 20%;
             padding: 0;
         }
+
         #montant{
             height: 100%;
             width: 80%;
@@ -160,7 +167,7 @@ $ErrorColor: #D94F83;
     }
         
     #middle{
-        height: 80%;
+        height: 70%;
         width: 100%;
         margin: 0;
         padding: 0;
@@ -196,7 +203,3 @@ $ErrorColor: #D94F83;
 
     }
 }
-
-
-
-    

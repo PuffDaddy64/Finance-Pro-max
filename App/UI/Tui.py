@@ -68,7 +68,7 @@ class Login(App):
     CSS_PATH="TCSS/login.tcss"
 
 
-    BINDINGS: ClassVar[list[Binding]] = [
+    BINDINGS: ClassVar[list[Binding]] = [ # type: ignore[override] # Ne pas enlever le commentaire, il retire une erreur relié à un override volontaire de notre part sur BINDINGS
         Binding("ctrl+q", "save_and_quit", "Quit", show = True, priority = True),
     ]
 
@@ -92,7 +92,7 @@ class Login(App):
         Method related to the lauch of the App
         """
         # Calling global variables useful in the function
-        global users, names,user
+        global users, names, user
         
         # Reading users et usernames files to be able to verify in the inputs corresponds to an exxisting user
         info_users = fichier.read_content("users_list")
@@ -138,6 +138,7 @@ class Login(App):
             ),
             id = "login",
         )
+
         yield Container(
                     
                     Horizontal(
@@ -302,11 +303,15 @@ class Login(App):
             style_ROW = self.style_ROW(ROW, historic_transactions[transaction])
             table_transactions.add_row(*(style_ROW),key=str(historic_transactions[transaction].get_id()))
 
-    def make_row(self,transaction:Transaction):
+    def make_row(self, transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
+<<<<<<< HEAD
         ROW = [str(transaction.get_id()),str(transaction.get_raison()) , str(transaction.get_montant()), str(transaction.get_date())]
         style_ROW = self.style_ROW(ROW, transaction)
         table_transactions.add_row(*style_ROW,key=str(transaction.get_id()))
+=======
+        table_transactions.add_row(str(transaction.get_id()), transaction.get_raison(), transaction.get_montant(), str(transaction.get_date()), key=str(transaction.get_id()))
+>>>>>>> refs/remotes/origin/main
 
     def changes_cells(self,transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
@@ -322,7 +327,7 @@ class Login(App):
         if user is not None:
             menu = self.query_one("#options", RadioSet)
             choix = menu.pressed_button
-            new_transaction = Transaction(montant= montant.value,choix=choix.id,raison = raison_value )
+            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value )
             user.add_transaction(new_transaction)
             self.make_row(new_transaction)
             self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
@@ -430,14 +435,23 @@ class Login(App):
         labels.remove_children()
         labels.mount(Label(user.get_name()))
         labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
+<<<<<<< HEAD
         # Montant 
+=======
+
+        # Montant
+>>>>>>> refs/remotes/origin/main
         inputChiffre = self.query_one('#chiffre', Input) 
         inputChiffre.border_subtitle = "Montant"
 
         # Raison
         inputRaison = self.query_one('#raison', Input) 
         inputRaison.border_subtitle = "Raison"
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> refs/remotes/origin/main
         # ID
         inputID = self.query_one('#ID', Input) 
         inputID.border_subtitle = "ID"

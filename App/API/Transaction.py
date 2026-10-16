@@ -18,7 +18,7 @@ class Transaction:
 
     ID = 0
 
-    def __init__(self,choix:int, raison:str, montant:float) -> None:
+    def __init__(self,choix:str, raison:str, montant:str) -> None:
          """
              Initialize values
          """ 
@@ -37,8 +37,6 @@ class Transaction:
         Method returning the ID of the transaction
         """
         return self.id
-
-    # The ID does not have a modify method because the ID needs to be auto generated for the program to work correctly.
 
 # Methods related to the reason of the transaction
     def validation_raison(self, raison:str) -> bool:
