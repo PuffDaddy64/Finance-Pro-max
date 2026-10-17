@@ -133,20 +133,32 @@
             
             #chiffre{
                 height: 100%;
-                max-width: 50%;
+                max-width: 20%;
 
             }
             #ID{
                 height: 100%;
-                width: 20%;
+                width: 10%;
                 display: none;
             }
       
             #raison{
                 height:100%;
-                max-width: 50%;
+                max-width: 20%;
             }
             
+			#year{
+				height: 100%;
+				max-width: 20%;
+			}
+			#month{
+				height: 100%;
+				max-width: 20%;
+			}
+			#day{
+				height: 100%;
+				max-width: 20%;
+			}
 
         }
     }

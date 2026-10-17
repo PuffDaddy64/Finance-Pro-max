@@ -4,7 +4,7 @@
  Name Of File : TUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 24 septembre 2026
+ Date : 17 ocotbre 2026
 
 Description : UI handler whic appearsin the terminal. This UI is built with a library called Textual.
 """
@@ -34,6 +34,7 @@ import subprocess
 import platform
 from getpass import getpass
 import pickle
+import API.Validation as Validation
 
 # Classes modified for our App
 # Class for a button
@@ -163,6 +164,21 @@ class Login(App):
                                 type="text",
                                 id="raison"
                             ),
+                            Input(
+                                type= "text",
+                                id = "year",
+                                classes = "no_display"
+                            ),
+                            Input(
+                                type= "text",
+                                id = "month",
+                                classes = "no_display"
+                                ),
+                            Input(
+                                type= "text",
+                                id = "day",
+                                classes = "no_display"
+                                ),
                             id="montant"
                         ),
                         id="top",
@@ -282,11 +298,14 @@ class Login(App):
         global user
         montant = self.query_one("#chiffre", Input)
         raison = self.query_one("#raison", Input)
+        year = self.query_one("#year", Input)
+        month = self.query_one("#month", Input)
+        day = self.query_one("#day", Input)
         raison_value = raison.value if raison.value != "" else "Aucune raison"
         if user is not None:
             menu = self.query_one("#options", RadioSet)
             choix = menu.pressed_button
-            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value )
+            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value, year = int(year.value) if Validation.IsYear(year.value) else None, month = int(month.value) if Validation.IsMonth(month.value) else None, day = int(day.value) if Validation.IsDay(day.value) else None)
             user.add_transaction(new_transaction)
             self.make_row(new_transaction)
             self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
@@ -295,6 +314,12 @@ class Login(App):
             raison.action_delete_left_all()
             montant.action_end()
             montant.action_delete_left_all()
+            year.action_end()
+            year.action_delete_left_all()
+            month.action_end()
+            month.action_delete_left_all()
+            day.action_end()
+            day.action_delete_left_all()
             
 
             
@@ -302,18 +327,31 @@ class Login(App):
             raise ValueError("The user hasn't been set and we are yet on second page")
 
     async def modify_transaction(self):
+
         global user
+
+        #  Get all informations from the inputs
+        id_transaction = self.query_one("#ID", Input)
+
         montant = self.query_one("#chiffre", Input)
+        montant_value = montant.value if montant.value != "" else None
+
         raison = self.query_one("#raison", Input)
         raison_value = raison.value if raison.value != "" else None
-        id_transaction = self.query_one("#ID", Input)
+
+        year = self.query_one("#year", Input)
+
+        month = self.query_one("#month", Input)
+
+        day = self.query_one("#day", Input)
+
         if user is not None:
             if int(id_transaction.value) <= user.get_last_transaction().get_id() and int(id_transaction.value) >= 0:
                 choix = "d" if int(montant.value) >= 0 else "r"
                 if choix == "r":
                     montant.value = str(abs(float(montant.value)))
-                transaction_to_modify = user.get_transactions()[int(id_transaction.value)]
-                transaction_to_modify.change_transaction(new_raison=raison_value,new_montant=montant.value,new_choix=choix)
+                transaction_to_modify: Transaction = user.get_transactions()[int(id_transaction.value)]
+                transaction_to_modify.change_transaction(new_raison = raison_value, new_montant = montant_value, new_choix = choix, new_year = int(year.value) if Validation.IsYear(year.value) else None, new_month =int(month.value) if Validation.IsMonth(month.value) else None, new_day = int(day.value) if Validation.IsDay(day.value) else None)
                 user.save_info()
                 self.changes_cells(transaction_to_modify)
                 self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
@@ -321,6 +359,12 @@ class Login(App):
                 raison.action_delete_left_all()
                 montant.action_end()
                 montant.action_delete_left_all()
+                year.action_end()
+                year.action_delete_left_all()
+                month.action_end()
+                month.action_delete_left_all()
+                day.action_end()
+                day.action_delete_left_all()
                 if(id_transaction.has_class("invalid")):
                     id_transaction = self.query_one('#ID', Input)
                     id_transaction.border_subtitle = "ID"
@@ -407,6 +451,18 @@ class Login(App):
         inputID = self.query_one('#ID', Input) 
         inputID.border_subtitle = "ID"
 
+        # Year
+        inputYear = self.query_one('#year', Input) 
+        inputYear.border_subtitle = "Year"
+
+        # Month
+        inputMonth = self.query_one('#month', Input) 
+        inputMonth.border_subtitle = "Month"
+
+        # Day
+        inputDay = self.query_one('#day', Input) 
+        inputDay.border_subtitle = "Day"
+
         
 ###################################################################################
 
@@ -429,7 +485,7 @@ class Login(App):
         if input_id == "user" or input_id == "pwd": # Login page
             self.login_page_treatment()
 
-        elif (event.control.id == "chiffre" or event.control.id == "raison" or event.control.id == "ID") and self.query_one("#ID",Input).display == False : # Second page
+        elif (event.control.id == "chiffre" or event.control.id == "raison" or event.control.id == "ID" or event.control.id == "year" or event.control.id == "month" or event.control.id == "day") and self.query_one("#ID",Input).display == False : # Second page
             await self.add_transaction()
         elif self.query_one("#ID",Input).display == True and (self.query_one("#chiffre",Input).value != "" or self.query_one("#ID",Input).value != ""):
             await self.modify_transaction()
@@ -438,12 +494,18 @@ class Login(App):
         radio_button = event.pressed
         if radio_button.id == "m":
             self.query_one("#ID",Input).display = True
-            self.query_one("#chiffre",Input).styles.max_width = '40%'
-            self.query_one("#raison",Input).styles.max_width = '40%'
+            self.query_one("#year",Input).styles.max_width = "20%"
+            self.query_one("#month",Input).styles.max_width = "10%"
+            self.query_one("#day",Input).styles.max_width = "10%"
+            self.query_one("#chiffre",Input).styles.max_width = '20%'
+            self.query_one("#raison",Input).styles.max_width = '30%'
         else:
             self.query_one("#ID",Input).display = False
-            self.query_one("#chiffre",Input).styles.max_width = '50%'
-            self.query_one("#raison",Input).styles.max_width = '50%'
+            self.query_one("#chiffre",Input).styles.max_width = '20%'
+            self.query_one("#raison",Input).styles.max_width = '20%'
+            self.query_one("#year",Input).styles.max_width = '20%'
+            self.query_one("#month",Input).styles.max_width = '20%'
+            self.query_one("#day",Input).styles.max_width = '20%'
 
     def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
