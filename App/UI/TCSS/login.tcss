@@ -1,7 +1,12 @@
 
  
+$borderColor: #6B6A2E;
+$ErrorColor: #D94F83;
+
+
  Screen{
      align: center middle;
+     background: #101210;
            
 }
 
@@ -9,44 +14,43 @@
 
  Input{
     background:white 0%;
-    border: dashed #ffcc00 20%;
+    border: dashed $borderColor  20%;
     tint: #267326 5%;
-    border-subtitle-color: #cccc00 75%;
+    border-subtitle-color: $borderColor 75%;
             
     }
     Input:focus{
-        border: dashed #ffcc00 50%;
-        background: yellow 15%;
+        border: dashed $borderColor 50%;
     }
 
     Input.invalid:focus{
-        border-title-color:  #ff3c00 75%;
-        background: #ff3c00 5%;	
-        border: dashed #ff3c00 50%;
+        border-title-color:  $ErrorColor 75%;
+        background: $ErrorColor 5%;	
+        border: dashed $ErrorColor 50%;
 
 
     }
     Input.invalid{
-        border: dashed #ff3c00 20%;
-        border-title-color:  #ff3c00 50%;
+        border: dashed $ErrorColor 20%;
+        border-title-color:  $ErrorColor 50%;
     }
 
 
 
 #login{
 	Label{
-		border: ascii white 62%;
+		border: ascii $borderColor  62%;
 		padding:1;
 
 		align: center middle;
 
-		color: #ffcc00 80%;		
+		color: #D9AD54 80%;		
 	}
 
 		
 	#messageBox{
 		
-		border: double white 55%;
+		border: double $borderColor 55%;
 		box-sizing: border-box;
 		max-height: 45%;
 		margin-bottom:0;
@@ -69,7 +73,7 @@
 			margin: 0 ;	
 			padding: 0;
 			Label{
-				border: dashed #ffcc00 20%;
+				border: dashed $borderColor  20%;
 				align: right top;
 				padding:2 0;
 				margin:0;}
@@ -82,21 +86,19 @@
 			
 		 }
 		 #yes{
-				border: dashed #ffcc00 20%;
-				background:white 0%;
+				border: dashed $borderColor  20%;
+				background: $borderColor  15%;
 			}
 			#yes:focus{
-				background: yellow 15%;
-				border: dashed #ffcc00 75%;
+				border: dashed $borderColor  75%;
 			}
 			#no{
 				margin:1 0 0 0 ;
-				border: dashed #ff3c00 20%;
-				background:white 0%;
+				border: dashed $ErrorColor 20%;
+				background: $ErrorColor 15%;
 			}
 			#no:focus{
-				border: dashed #ff3c00 50%;
-				background: #ff3c00 5%;
+				border: dashed $ErrorColor 50%;
 			}
 		}
 
@@ -113,8 +115,12 @@
     width: 100%;
     
     #top{
+<<<<<<< HEAD
+        height: 12%;
+=======
 
         height: 30%;
+>>>>>>> refs/remotes/origin/main
         width: 100%;
         margin: 0;
         padding: 0;
@@ -127,8 +133,7 @@
         }
 
         #montant{
-           
-            height: 50%;
+            height: 100%;
             width: 80%;
             
             #chiffre{
@@ -168,6 +173,8 @@
         width: 100%;
         margin: 0;
         padding: 0;
+        border-top: panel $borderColor 50%;
+
         #info{
             height: 100%;
             width: 20%;
@@ -176,6 +183,25 @@
         #table{
             height: 100%;
             width: 80%;
+            background: #171A17 100%;
+            border: double $borderColor 60%;
+            tint: #267326 5%;
         }
+        #table:focus{
+            border: double $borderColor 80%;
+        }
+        
+        #left{
+            border: $borderColor 62%;      
+            #info{
+                width: 100%;
+                height: auto;
+                border:  round $ErrorColor  62%;
+                padding:1;
+                margin: 1;
+                align: left top;              
+            }
+        }
+
     }
 }
