@@ -37,6 +37,7 @@ import platform
 from getpass import getpass
 import pickle
 import API.Validation as Validation
+import ast
 
 # Classes modified for our App
 # Class for a button
@@ -101,9 +102,9 @@ class Login(App):
         
         # Decode binary information and update variables
         if info_users is not None: # Update all users present
-            users.append(pickle.loads(info_users))
+            users = pickle.loads(info_users)
         if info_names is not None: # update all usernames present
-            names.append(pickle.loads(info_names))
+            names = pickle.loads(info_names)
 
         # Lauches the main features
         yield Vertical(Label("$$$$$$$\\  $$\\   $$\\ $$$$$$$\\   $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n$$  __$$\\ $$ |  $$ |$$  __$$\\ $$  __$$\\ $$  _____|\\__$$  __|\n$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ /  \\__|$$ |         $$ |\n$$$$$$$\\ |$$ |  $$ |$$ |  $$ |$$ |$$$$\\ $$$$$\\       $$ |\n$$  __$$\\ $$ |  $$ |$$ |  $$ |$$ |\\_$$ |$$  __|      $$ |\n$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |         $$ |\n$$$$$$$  |\\$$$$$$  |$$$$$$$  |\\$$$$$$  |$$$$$$$$\\    $$ |\n\\_______/  \\______/ \\_______/  \\______/ \\________|   \\__|", id = "title")
@@ -229,7 +230,7 @@ class Login(App):
         Method to connect the user to the app
         """
         # Calling global variables useful in the function
-        global users, names,user
+        global users, names, user
             # Check if the user exists
         if username in names:
             # Check if the password is correct
@@ -238,12 +239,9 @@ class Login(App):
                 self.activate_user(username, pwd)
                 self.second_page()
                 self.state += 1
-                
-
             else:
                 self.try_pwd -= 1
                 if self.try_pwd > 0:
-                
                     messages = self.query_one("#errorMessage")
                     self.query_one("#pwd",Input).action_select_all()
                     self.query_one("#pwd",Input).action_end
@@ -266,14 +264,18 @@ class Login(App):
             butttonBox.mount(Button("NON",id="no",))
 
     def makeUser(self):
-        global users, names,user
-        new_user = User((self.query_one("#user", Input).value),(self.query_one("#pwd", Input).value))
+
+        global users, names, user
+
+        username = self.query_one("#user", Input).value
+        pwd = self.query_one("#pwd", Input).value
+        new_user = User(username, pwd)
         user = new_user
-        fichier.add_object_binary("users_list", (self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
-        fichier.add_object_binary("names", (self.query_one("#user", Input).value))
-        users.append((self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
-        names.append(self.query_one("#user", Input).value) 
-        self.connect(self.query_one("#user", Input).value,self.query_one("#pwd", Input).value)
+        users.append(username + pwd)
+        names.append(username)
+        fichier.add_object_binary("users_list", users)
+        fichier.add_object_binary("names", names)
+        self.connect(username, pwd)
 
 
 ###################################################################################
@@ -324,7 +326,6 @@ class Login(App):
         ROW = [str(transaction.get_id()),str(transaction.get_raison()) , str(transaction.get_montant()), str(transaction.get_date())]
         style_ROW = self.style_ROW(ROW, transaction)
         table_transactions.add_row(*style_ROW,key=str(transaction.get_id()))
-        table_transactions.add_row(str(transaction.get_id()), transaction.get_raison(), transaction.get_montant(), str(transaction.get_date()), key=str(transaction.get_id()))
 
     def changes_cells(self,transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
@@ -448,14 +449,14 @@ class Login(App):
         self.username, self.pwd = self.query_one("#user", Input), self.query_one("#pwd", Input)
         
         if((self.username.is_valid)==False ):
-            self.username.border_title = "Sorry Username need to be longer than 5 characters"
+            self.username.border_title = "Username needs to be at least 5 characters"
             self.username.add_class("invalid",update=True)
         else:
             self.username.remove_class("invalid",update=True)
             self.username.border_title = ""
         
         if((self.pwd.is_valid)==False ):
-            self.pwd.border_title = "Sorry Password need to be longer than 4 characters"
+            self.pwd.border_title = "Password needs to be at least 4 characters"
             self.pwd.add_class("invalid",update=True)
         else:
             self.pwd.remove_class("invalid",update=True)
@@ -578,13 +579,10 @@ class Login(App):
 
 
 ###################################################################################
-            
-
-
 
 # Global variables
-users:list = [] # Initializing the container for all users existant in te system
-names:list = [] # List of usernames
+names = []
+users = []
 
 def lauch_ui():
     """
