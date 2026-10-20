@@ -19,7 +19,7 @@ from textual import on
 from textual.app import App,ComposeResult
 from textual.containers import  Container, Horizontal, Vertical
 from textual.widgets import DataTable, Header, Footer, Button, Input, Label, RadioButton, RadioSet
-from textual.validation import Length
+from textual.validation import Length,Validator, ValidationResult
 from textual.binding import Binding
 from rich.text import Text
 from typing import ClassVar
@@ -168,23 +168,10 @@ class Login(App):
                                 id="raison"
                             ),
                             Input(
-                                type= "text",
-                                id = "year",
-                                classes = "no_display"
-                            ),
-                            Input(
-                                type= "text",
-                                id = "month",
-                                classes = "no_display"
-                                ),
-                            Input(
-                                type= "text",
-                                id = "day",
-                                classes = "no_display"
-                                ),
-                            Input(
                                 type="text",
+                                validators=[Length(10)],
                                 id="date",
+                               
                             ),
                             Input(
                                 type="text",
@@ -214,6 +201,8 @@ class Login(App):
 
 
 ###################################################################################
+
+
 
 
 
@@ -471,6 +460,7 @@ class Login(App):
         """
         global user
         
+        
         self.query_one("#body").display = True
         self.make_rows(user)
         labels = self.query_one( "#info")
@@ -489,21 +479,14 @@ class Login(App):
         inputID = self.query_one('#ID', Input) 
         inputID.border_subtitle = "ID"
 
-        # Year
-        inputYear = self.query_one('#year', Input) 
-        inputYear.border_subtitle = "Year"
-
-        # Month
-        inputMonth = self.query_one('#month', Input) 
-        inputMonth.border_subtitle = "Month"
-
-        # Day
-        inputDay = self.query_one('#day', Input) 
-        inputDay.border_subtitle = "Day"
-
         #DATE
         inputDate = self.query_one('#date', Input)
         inputDate.border_subtitle = "Date"
+        inputDate.border_title = "AAAA\\MM\\DD"
+        if((inputDate.is_valid)==False ):
+            inputDate.add_class("invalid",update=True)
+        else:
+            inputDate.remove_class("invalid",update=True)
 
         #categorie
         inputCategorie = self.query_one('#categorie', Input)
@@ -526,6 +509,16 @@ class Login(App):
 ###########################   ON_ Method (Event)   ############################
 
 
+    async def on_input_changed(self,event:Input.Changed):
+        ##For the date Input:
+        input_date = self.query_one("#date",Input)
+        if len(input_date.value) == 4 or len(input_date.value) == 7 :
+            input_date.action_end()
+            input_date.insert_text_at_cursor("\\")
+            
+
+
+        
     async def on_input_submitted(self, event: Input.Submitted):
         """
         Method called by textual when the enter key is pushed on an input
@@ -543,18 +536,15 @@ class Login(App):
         radio_button = event.pressed
         if radio_button.id == "m":
             self.query_one("#ID",Input).display = True
-            self.query_one("#year",Input).styles.max_width = "20%"
-            self.query_one("#month",Input).styles.max_width = "10%"
-            self.query_one("#day",Input).styles.max_width = "10%"
-            self.query_one("#chiffre",Input).styles.max_width = '20%'
-            self.query_one("#raison",Input).styles.max_width = '30%'
+            self.query_one("#chiffre",Input).styles.max_width = '25%'
+            self.query_one("#raison",Input).styles.max_width = '25%'
+            self.query_one("#date",Input).styles.max_widht = '25%'
         else:
             self.query_one("#ID",Input).display = False
-            self.query_one("#chiffre",Input).styles.max_width = '20%'
-            self.query_one("#raison",Input).styles.max_width = '20%'
-            self.query_one("#year",Input).styles.max_width = '20%'
-            self.query_one("#month",Input).styles.max_width = '20%'
-            self.query_one("#day",Input).styles.max_width = '20%'
+            self.query_one("#chiffre",Input).styles.max_width = '33%'
+            self.query_one("#raison",Input).styles.max_width = '33%'
+            self.query_one("#date",Input).styles.max_width = '33%'
+            
 
     def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
@@ -579,6 +569,14 @@ class Login(App):
 
 
 ###################################################################################
+
+
+
+
+
+
+
+
 
 # Global variables
 names = []

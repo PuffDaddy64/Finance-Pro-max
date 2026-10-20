@@ -17,6 +17,8 @@ $ErrorColor: #D94F83;
     border: dashed $borderColor  20%;
     tint: #267326 5%;
     border-subtitle-color: $borderColor 75%;
+    border-title-color: $borderColor 75%;
+
             
     }
     Input:focus{
@@ -133,33 +135,24 @@ $ErrorColor: #D94F83;
             
             #chiffre{
                 height: 100%;
-                max-width: 20%;
+                max-width: 33%;
 
             }
             #ID{
                 height: 100%;
-                width: 10%;
+                width: 25%;
                 display: none;
             }
       
             #raison{
                 height:100%;
-                max-width: 20%;
+                max-width: 33%;
             }
             
-			#year{
-				height: 100%;
-				max-width: 20%;
-			}
-			#month{
-				height: 100%;
-				max-width: 20%;
-			}
-			#day{
-				height: 100%;
-				max-width: 20%;
-			}
-
+			#date{
+                height:100%;
+                max-width:33%;
+            }
         }
     }
         
