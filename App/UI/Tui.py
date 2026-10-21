@@ -305,13 +305,9 @@ class Login(App):
 
     def make_row(self, transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
-<<<<<<< HEAD
         ROW = [str(transaction.get_id()),str(transaction.get_raison()) , str(transaction.get_montant()), str(transaction.get_date())]
         style_ROW = self.style_ROW(ROW, transaction)
         table_transactions.add_row(*style_ROW,key=str(transaction.get_id()))
-=======
-        table_transactions.add_row(str(transaction.get_id()), transaction.get_raison(), transaction.get_montant(), str(transaction.get_date()), key=str(transaction.get_id()))
->>>>>>> refs/remotes/origin/main
 
     def changes_cells(self,transaction:Transaction):
         table_transactions = self.query_one("#table", DataTable)
@@ -435,23 +431,14 @@ class Login(App):
         labels.remove_children()
         labels.mount(Label(user.get_name()))
         labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
-<<<<<<< HEAD
         # Montant 
-=======
-
-        # Montant
->>>>>>> refs/remotes/origin/main
         inputChiffre = self.query_one('#chiffre', Input) 
         inputChiffre.border_subtitle = "Montant"
 
         # Raison
         inputRaison = self.query_one('#raison', Input) 
         inputRaison.border_subtitle = "Raison"
-<<<<<<< HEAD
         
-=======
-
->>>>>>> refs/remotes/origin/main
         # ID
         inputID = self.query_one('#ID', Input) 
         inputID.border_subtitle = "ID"

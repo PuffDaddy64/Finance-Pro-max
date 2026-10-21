@@ -115,12 +115,8 @@ $ErrorColor: #D94F83;
     width: 100%;
     
     #top{
-<<<<<<< HEAD
-        height: 12%;
-=======
 
         height: 30%;
->>>>>>> refs/remotes/origin/main
         width: 100%;
         margin: 0;
         padding: 0;
