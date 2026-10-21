@@ -46,7 +46,7 @@ def add_object_binary(file_name,data)-> None:
         with BufferedWriter(FileIO((__PATH+file_name+'.bin'),"wb")) as writer:
             pickle.dump(data, writer)
      except IOError as e: 
-        print(f"An error occure when wrinting the files")
+        print(f"An error occure when writing the files")
 
 """
     look if file exist

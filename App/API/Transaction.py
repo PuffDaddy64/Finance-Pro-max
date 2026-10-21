@@ -5,7 +5,7 @@
  Name Of File : Transaction.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 27 août 2026
+ Date : 17 octobre 2026
  
 Description  : Class describing a transaction.
                The class is called from the User module to manage the information related to a particular transaction.
@@ -18,7 +18,7 @@ class Transaction:
 
     ID = 0
 
-    def __init__(self,choix:str, raison:str, montant:str) -> None:
+    def __init__(self,choix:str, raison:str, montant:str, year:int | None, month:int | None, day:int | None) -> None:
          """
              Initialize values
          """ 
@@ -27,7 +27,7 @@ class Transaction:
          Transaction.ID += 1
          self.set_raison(raison = raison)
          self.set_montant(montant, choix)
-         self.set_date()
+         self.set_date(year = year, month = month, day = day)
 
  # Methods related to the id
     # The ID does not have a set method in the transaction module because it is set by the user because of the need of a memory controlled by the user.
@@ -107,8 +107,12 @@ class Transaction:
         return self.montant
 
  # Methods related to the date ofthe transaction
-    def set_date(self) -> None:
-        self.date:datetime.date = datetime.datetime.now().date()
+    def set_date(self, year: int | None, month: int | None, day: int | None) -> None:
+        if year == None or month == None or day == None:
+            self.date: datetime.date = datetime.datetime.now().date()
+            
+        else:
+            self.date: datetime.date = datetime.datetime(year = year, month = month, day = day).date()
 
     def get_date(self) -> datetime.date:
         """
@@ -139,56 +143,11 @@ class Transaction:
 
         print(widget)
 
-    def change_transaction(self, new_raison:str, new_montant:float,new_choix:str) -> None:
+    def change_transaction(self, new_raison:str |None, new_montant:str | None, new_choix:str, new_year:int | None, new_month:int | None, new_day:int | None) -> None:
         if(new_raison != None):
             self.set_raison(raison = new_raison)
-        self.set_montant(new_montant, new_choix)
-
-    # Methods related to the modification of a transaction
-    def modify(self):
-        """
-        Method to modify informations of a transaction
-        """
-        while True:
-            modification = input("\nQue voulez-vous modifier? (Raison(r), Montant (m), Date(d), Type(t)): ").lower()
-            if modification == "r":
-                new_reason = input("Entrez la nouvelle raison pour cette transaction: ")
-                while not self.validation_raison(new_reason):
-                    new_reason = input("Entrez la nouvelle raison pour cette transaction: ")
-                self.modify_raison(new_reason)
-                break
-            elif modification == "m":
-                new_amount = input("Entrez le nouveau montant: ")
-                while not self.validation_montant(new_amount):
-                    new_amount = input("Entrez le nouveau montant: ")
-                if self.get_type() == "d":
-                    self.modify_montant(int(new_amount))
-                else:
-                    self.modify_montant(-int(new_amount))
-                break
-            elif modification == "d":
-                # Entrer l'année
-                new_year = input("Entrez l'année de la transaction: ")
-                while not self.validation_year(new_year):
-                    new_year = input("Entrez l'année de la transaction: ")
-
-                # Entrer le mois
-                new_month = input("Entrez le mois de la transaction: ")
-                while not self.validation_month(new_month):
-                    new_month = input("Entrez le mois de la transaction: ")
-
-                new_day = input("Entrez le jour de la transaction: ")
-                while not self.validation_day(new_day):
-                    new_day = input("Entrez le jour de la transaction: ")
-                self.modify_date(int(new_year), int(new_month), int(new_day))
-                break
-
-            elif modification == "t":
-                new_type = input("Entrez le nouveau type de transaction (Dépôt(d) ou Retrait(r)): ").lower()
-                while new_type not in ["d", "r"]:
-                    new_type = input("Entrez le nouveau type de transaction (Dépôt(d) ou Retrait(r)): ").lower()
-                self.modify_type(new_type)
-                break
-            else:
-                print("Votre entrée n'est pas dans (r, m, d, t).")
-                t.sleep(1)
+        if new_montant is not None:
+            self.set_montant(new_montant, new_choix)
+        
+        self.set_date(year = new_year if new_year is not None else self.date.year, month = new_month if new_month is not None else self.date.month, day = new_day if new_day is not None else self.date.day)
+        

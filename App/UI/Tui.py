@@ -4,7 +4,7 @@
  Name Of File : TUi.py
  Author : Thomas Raymond
  Author : Félix Roussin 
- Date : 24 septembre 2026
+ Date : 17 ocotbre 2026
 
 Description : UI handler whic appearsin the terminal. This UI is built with a library called Textual.
 """
@@ -19,7 +19,7 @@ from textual import on
 from textual.app import App,ComposeResult
 from textual.containers import  Container, Horizontal, Vertical
 from textual.widgets import DataTable, Header, Footer, Button, Input, Label, RadioButton, RadioSet
-from textual.validation import Length
+from textual.validation import Length,Validator, ValidationResult
 from textual.binding import Binding
 from rich.text import Text
 from typing import ClassVar
@@ -36,6 +36,8 @@ import subprocess
 import platform
 from getpass import getpass
 import pickle
+import API.Validation as Validation
+import ast
 
 # Classes modified for our App
 # Class for a button
@@ -100,9 +102,9 @@ class Login(App):
         
         # Decode binary information and update variables
         if info_users is not None: # Update all users present
-            users.append(pickle.loads(info_users))
+            users = pickle.loads(info_users)
         if info_names is not None: # update all usernames present
-            names.append(pickle.loads(info_names))
+            names = pickle.loads(info_names)
 
         # Lauches the main features
         yield Vertical(Label("$$$$$$$\\  $$\\   $$\\ $$$$$$$\\   $$$$$$\\  $$$$$$$$\\ $$$$$$$$\\ \n$$  __$$\\ $$ |  $$ |$$  __$$\\ $$  __$$\\ $$  _____|\\__$$  __|\n$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ /  \\__|$$ |         $$ |\n$$$$$$$\\ |$$ |  $$ |$$ |  $$ |$$ |$$$$\\ $$$$$\\       $$ |\n$$  __$$\\ $$ |  $$ |$$ |  $$ |$$ |\\_$$ |$$  __|      $$ |\n$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |         $$ |\n$$$$$$$  |\\$$$$$$  |$$$$$$$  |\\$$$$$$  |$$$$$$$$\\    $$ |\n\\_______/  \\______/ \\_______/  \\______/ \\________|   \\__|", id = "title")
@@ -167,7 +169,9 @@ class Login(App):
                             ),
                             Input(
                                 type="text",
+                                validators=[Length(10)],
                                 id="date",
+                               
                             ),
                             Input(
                                 type="text",
@@ -201,6 +205,8 @@ class Login(App):
 
 
 
+
+
 ###########################   User Method  ############################
 
 
@@ -213,7 +219,7 @@ class Login(App):
         Method to connect the user to the app
         """
         # Calling global variables useful in the function
-        global users, names,user
+        global users, names, user
             # Check if the user exists
         if username in names:
             # Check if the password is correct
@@ -222,12 +228,9 @@ class Login(App):
                 self.activate_user(username, pwd)
                 self.second_page()
                 self.state += 1
-                
-
             else:
                 self.try_pwd -= 1
                 if self.try_pwd > 0:
-                
                     messages = self.query_one("#errorMessage")
                     self.query_one("#pwd",Input).action_select_all()
                     self.query_one("#pwd",Input).action_end
@@ -250,14 +253,18 @@ class Login(App):
             butttonBox.mount(Button("NON",id="no",))
 
     def makeUser(self):
-        global users, names,user
-        new_user = User((self.query_one("#user", Input).value),(self.query_one("#pwd", Input).value))
+
+        global users, names, user
+
+        username = self.query_one("#user", Input).value
+        pwd = self.query_one("#pwd", Input).value
+        new_user = User(username, pwd)
         user = new_user
-        fichier.add_object_binary("users_list", (self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
-        fichier.add_object_binary("names", (self.query_one("#user", Input).value))
-        users.append((self.query_one("#user", Input).value) + (self.query_one("#pwd", Input).value))
-        names.append(self.query_one("#user", Input).value) 
-        self.connect(self.query_one("#user", Input).value,self.query_one("#pwd", Input).value)
+        users.append(username + pwd)
+        names.append(username)
+        fichier.add_object_binary("users_list", users)
+        fichier.add_object_binary("names", names)
+        self.connect(username, pwd)
 
 
 ###################################################################################
@@ -319,11 +326,14 @@ class Login(App):
         global user
         montant = self.query_one("#chiffre", Input)
         raison = self.query_one("#raison", Input)
+        date = self.query_one("#date", Input)
         raison_value = raison.value if raison.value != "" else "Aucune raison"
         if user is not None:
             menu = self.query_one("#options", RadioSet)
             choix = menu.pressed_button
-            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value )
+            splitted_date = date.value.split("\\")
+            year, month, day = splitted_date[0], splitted_date[1], splitted_date[2]
+            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value, year = int(year) if Validation.IsYear(year) else None, month = int(month) if Validation.IsMonth(month) else None, day = int(day) if Validation.IsDay(day) else None)
             user.add_transaction(new_transaction)
             self.make_row(new_transaction)
             self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
@@ -332,6 +342,8 @@ class Login(App):
             raison.action_delete_left_all()
             montant.action_end()
             montant.action_delete_left_all()
+            date.action_end()
+            date.action_delete_left_all()
             
 
             
@@ -339,18 +351,31 @@ class Login(App):
             raise ValueError("The user hasn't been set and we are yet on second page")
 
     async def modify_transaction(self):
+
         global user
+
+        #  Get all informations from the inputs
+        id_transaction = self.query_one("#ID", Input)
+
         montant = self.query_one("#chiffre", Input)
+        montant_value = montant.value if montant.value != "" else None
+
         raison = self.query_one("#raison", Input)
         raison_value = raison.value if raison.value != "" else None
-        id_transaction = self.query_one("#ID", Input)
+
+        year = self.query_one("#year", Input)
+
+        month = self.query_one("#month", Input)
+
+        day = self.query_one("#day", Input)
+
         if user is not None:
             if int(id_transaction.value) <= user.get_last_transaction().get_id() and int(id_transaction.value) >= 0:
                 choix = "d" if int(montant.value) >= 0 else "r"
                 if choix == "r":
                     montant.value = str(abs(float(montant.value)))
-                transaction_to_modify = user.get_transactions()[int(id_transaction.value)]
-                transaction_to_modify.change_transaction(new_raison=raison_value,new_montant=montant.value,new_choix=choix)
+                transaction_to_modify: Transaction = user.get_transactions()[int(id_transaction.value)]
+                transaction_to_modify.change_transaction(new_raison = raison_value, new_montant = montant_value, new_choix = choix, new_year = int(year.value) if Validation.IsYear(year.value) else None, new_month =int(month.value) if Validation.IsMonth(month.value) else None, new_day = int(day.value) if Validation.IsDay(day.value) else None)
                 user.save_info()
                 self.changes_cells(transaction_to_modify)
                 self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
@@ -358,6 +383,12 @@ class Login(App):
                 raison.action_delete_left_all()
                 montant.action_end()
                 montant.action_delete_left_all()
+                year.action_end()
+                year.action_delete_left_all()
+                month.action_end()
+                month.action_delete_left_all()
+                day.action_end()
+                day.action_delete_left_all()
                 if(id_transaction.has_class("invalid")):
                     id_transaction = self.query_one('#ID', Input)
                     id_transaction.border_subtitle = "ID"
@@ -403,14 +434,14 @@ class Login(App):
         self.username, self.pwd = self.query_one("#user", Input), self.query_one("#pwd", Input)
         
         if((self.username.is_valid)==False ):
-            self.username.border_title = "Sorry Username need to be longer than 5 characters"
+            self.username.border_title = "Username needs to be at least 5 characters"
             self.username.add_class("invalid",update=True)
         else:
             self.username.remove_class("invalid",update=True)
             self.username.border_title = ""
         
         if((self.pwd.is_valid)==False ):
-            self.pwd.border_title = "Sorry Password need to be longer than 4 characters"
+            self.pwd.border_title = "Password needs to be at least 4 characters"
             self.pwd.add_class("invalid",update=True)
         else:
             self.pwd.remove_class("invalid",update=True)
@@ -424,6 +455,7 @@ class Login(App):
         Method to display the second page of the app
         """
         global user
+        
         
         self.query_one("#body").display = True
         self.make_rows(user)
@@ -446,6 +478,11 @@ class Login(App):
         #DATE
         inputDate = self.query_one('#date', Input)
         inputDate.border_subtitle = "Date"
+        inputDate.border_title = "AAAA\\MM\\DD"
+        if((inputDate.is_valid)==False ):
+            inputDate.add_class("invalid",update=True)
+        else:
+            inputDate.remove_class("invalid",update=True)
 
         #categorie
         inputCategorie = self.query_one('#categorie', Input)
@@ -468,6 +505,16 @@ class Login(App):
 ###########################   ON_ Method (Event)   ############################
 
 
+    async def on_input_changed(self,event:Input.Changed):
+        ##For the date Input:
+        input_date = self.query_one("#date",Input)
+        if len(input_date.value) == 4 or len(input_date.value) == 7 :
+            input_date.action_end()
+            input_date.insert_text_at_cursor("\\")
+            
+
+
+        
     async def on_input_submitted(self, event: Input.Submitted):
         """
         Method called by textual when the enter key is pushed on an input
@@ -476,7 +523,7 @@ class Login(App):
         if input_id == "user" or input_id == "pwd": # Login page
             self.login_page_treatment()
 
-        elif (event.control.id == "chiffre" or event.control.id == "raison" or event.control.id == "ID") and self.query_one("#ID",Input).display == False : # Second page
+        elif (event.control.id == "chiffre" or event.control.id == "raison" or event.control.id == "ID" or event.control.id == "date") and self.query_one("#ID",Input).display == False : # Second page
             await self.add_transaction()
         elif self.query_one("#ID",Input).display == True and (self.query_one("#chiffre",Input).value != "" or self.query_one("#ID",Input).value != ""):
             await self.modify_transaction()
@@ -485,16 +532,15 @@ class Login(App):
         radio_button = event.pressed
         if radio_button.id == "m":
             self.query_one("#ID",Input).display = True
-            self.query_one("#chiffre",Input).styles.max_width = '20%'
-            self.query_one("#raison",Input).styles.max_width = '20%'
-            self.query_one("#date",Input).styles.max_width = '20%'
-            self.query_one("#categorie",Input).styles.max_width = '20%'
-        else:
-            self.query_one("#ID",Input).display = False
             self.query_one("#chiffre",Input).styles.max_width = '25%'
             self.query_one("#raison",Input).styles.max_width = '25%'
-            self.query_one("#date",Input).styles.max_width = '25%'
-            self.query_one("#categorie",Input).styles.max_width = '25%'
+            self.query_one("#date",Input).styles.max_widht = '25%'
+        else:
+            self.query_one("#ID",Input).display = False
+            self.query_one("#chiffre",Input).styles.max_width = '33%'
+            self.query_one("#raison",Input).styles.max_width = '33%'
+            self.query_one("#date",Input).styles.max_width = '33%'
+            
 
     def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
@@ -519,13 +565,18 @@ class Login(App):
 
 
 ###################################################################################
-            
+
+
+
+
+
+
 
 
 
 # Global variables
-users:list = [] # Initializing the container for all users existant in te system
-names:list = [] # List of usernames
+names = []
+users = []
 
 def lauch_ui():
     """

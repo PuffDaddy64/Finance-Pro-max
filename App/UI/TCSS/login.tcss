@@ -17,6 +17,8 @@ $ErrorColor: #D94F83;
     border: dashed $borderColor  20%;
     tint: #267326 5%;
     border-subtitle-color: $borderColor 75%;
+    border-title-color: $borderColor 75%;
+
             
     }
     Input:focus{
@@ -116,7 +118,7 @@ $ErrorColor: #D94F83;
     
     #top{
 
-        height: 30%;
+        height: 12%;
         width: 100%;
         margin: 0;
         padding: 0;
@@ -134,31 +136,24 @@ $ErrorColor: #D94F83;
             
             #chiffre{
                 height: 100%;
-                max-width: 25%;
+                max-width: 33%;
 
             }
             #ID{
                 height: 100%;
-                width: 20%;
+                width: 25%;
                 display: none;
             }
       
             #raison{
                 height:100%;
-                max-width: 25%;
-            }
-
-            #date{
-                height:100%;
-                max-width: 25%;
-            }
-
-            #categorie{
-                height:100%;
-                max-width: 25%;
+                max-width: 33%;
             }
             
-
+			#date{
+                height:100%;
+                max-width:33%;
+            }
         }
     }
         
