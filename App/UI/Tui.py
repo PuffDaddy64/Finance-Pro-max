@@ -322,6 +322,7 @@ class Login(App):
         style = "#53C88B" if transaction.get_montant() >= 0 else "#D9AD54"
         table_transactions.update_cell(str(transaction.get_id()),"raison", Text(str(transaction.get_raison())))
         table_transactions.update_cell(str(transaction.get_id()), "montant", Text(str(transaction.get_montant()),style=style))
+        table_transactions.update_cell(str(transaction.get_id()), "date", Text(str(transaction.get_date())))
 
     async def add_transaction(self):
         global user
@@ -396,11 +397,14 @@ class Login(App):
 
 
         if user is not None:
-            if int(id_transaction.value) <= user.get_last_transaction().get_id() and float(id_transaction.value) >= 0:
-                choix = "d" if float(montant.value) >= 0 else "r"
-                if choix == "r":
-                    montant.value = str(abs(float(montant.value)))
-                transaction_to_modify: Transaction = user.get_transactions()[float(id_transaction.value)]
+            if int(id_transaction.value) <= user.get_last_transaction().get_id() and int(id_transaction.value) >= 0:
+                if montant_value is not None:
+                    choix = "d" if float(montant.value) >= 0 else "r"
+                    if choix == "r":
+                        montant_value = str(abs(float(montant_value)))
+                else:
+                    choix = None
+                transaction_to_modify: Transaction = user.get_transactions()[int(id_transaction.value)]
                 transaction_to_modify.change_transaction(new_raison = raison_value, new_montant = montant_value, new_choix = choix, new_year = int(year) if Validation.IsYear(year) else None, new_month =int(month) if Validation.IsMonth(month) else None, new_day = int(day) if Validation.IsDay(day) else None)
                 user.save_info()
                 self.changes_cells(transaction_to_modify)

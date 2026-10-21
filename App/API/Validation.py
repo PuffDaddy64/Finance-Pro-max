@@ -11,8 +11,10 @@ Description  : Class regrouping all sorts of validation
 
 def IsInteger(number: str) -> bool:
     try:
-        float(number)
+        int(number)
     except ValueError:
+        return False
+    except TypeError:
         return False
     return True
 
