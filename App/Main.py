@@ -13,12 +13,7 @@ Note: Le fichier possède actuellent deux fonctions de UI, c'est pour isoler le 
 
 """
 
-import UI.SimpleUi as Sui
 import UI.Tui
 
 if __name__ == "__main__":
-    Tui = True # True for TUI, False for SimpleUI
-    if Tui:
-        UI.Tui.lauch_ui()
-    else:
-        Sui.simple_ui()
+    UI.Tui.lauch_ui()

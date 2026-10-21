@@ -2,6 +2,7 @@
  
 $borderColor: #6B6A2E;
 $ErrorColor: #D94F83;
+$textcolor: #D2D5CC;
 
 
  Screen{
@@ -118,7 +119,7 @@ $ErrorColor: #D94F83;
     
     #top{
 
-        height: 12%;
+        height: 10%;
         width: 100%;
         margin: 0;
         padding: 0;
@@ -128,6 +129,33 @@ $ErrorColor: #D94F83;
             height: 100%;
             width: 20%;
             padding: 0;
+            #options{
+                background: white 0%;
+                
+                padding: 1;
+                content-align: center middle;
+                ListItem{
+                    height: 100%;
+                    width: 100%;
+                    align: center middle;
+                    outline: double $borderColor;
+                    
+                    Label{
+                        color: $textcolor;
+                    }
+                }
+
+                #d{
+                }
+                #r{
+                    
+                    display:none;
+                }
+                #m{
+                    display:none;
+                }
+                
+            }
         }
 
         #montant{

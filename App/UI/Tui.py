@@ -14,11 +14,12 @@ import os
 
 import sys
 import time
+import re;
 
 from textual import on
 from textual.app import App,ComposeResult
 from textual.containers import  Container, Horizontal, Vertical
-from textual.widgets import DataTable, Header, Footer, Button, Input, Label, RadioButton, RadioSet
+from textual.widgets import DataTable, Header, Footer, Button, Input, Label, RadioButton, RadioSet,ListView , ListItem
 from textual.validation import Length,Validator, ValidationResult
 from textual.binding import Binding
 from rich.text import Text
@@ -145,11 +146,11 @@ class Login(App):
                     
                     Horizontal(
                         Container(
-                            RadioSet(
-                                RadioButton("Depot", id="d", value = True),
-                                RadioButton("Retrait", id="r"),
-                                RadioButton("Modifier", id="m"),
-                                id = "options"
+                            ListView(
+                                ListItem(Label("Depot"),id="d",name="Depot"),
+                                ListItem(Label("Retrait"),id="r",name="Retrait"),
+                                ListItem(Label("Modifier"),id="m",name="Modifier"),
+                                id = "options",
                             ),
                         id="menu",
                         ),    
@@ -328,23 +329,49 @@ class Login(App):
         raison = self.query_one("#raison", Input)
         date = self.query_one("#date", Input)
         raison_value = raison.value if raison.value != "" else "Aucune raison"
+        
         if user is not None:
-            menu = self.query_one("#options", RadioSet)
-            choix = menu.pressed_button
-            splitted_date = date.value.split("\\")
-            year, month, day = splitted_date[0], splitted_date[1], splitted_date[2]
-            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value, year = int(year) if Validation.IsYear(year) else None, month = int(month) if Validation.IsMonth(month) else None, day = int(day) if Validation.IsDay(day) else None)
-            user.add_transaction(new_transaction)
-            self.make_row(new_transaction)
-            self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
-            user.save_info()
-            raison.action_end()
-            raison.action_delete_left_all()
-            montant.action_end()
-            montant.action_delete_left_all()
-            date.action_end()
-            date.action_delete_left_all()
-            
+            if(montant.value != ""):
+                if(montant.has_class("invalid")):
+                    montant.border_subtitle = "Montant"
+                    montant.remove_class("invalid",update=True)
+
+                menu = self.query_one("#options", ListView)
+                choix = menu.highlighted_child
+                if(re.search(r"^\d{4}\\\d{2}\\\d{2}$", date.value)):
+                    year, month, day = date.value.split("\\")
+                    if(Validation.IsYear(year) and Validation.IsMonth(month) and Validation.IsDay(day)):
+                        date.border_subtitle = "Date (Invalid Date)"
+                        date.add_class("invalid",update=True)
+                        return
+                    else:    
+                        date.border_subtitle = "Date"
+                        date.remove_class("invalid",update=True)
+                elif date.value == "":
+                    year, month, day = 0, 0, 0
+                    date.border_subtitle = "Date"
+                    date.remove_class("invalid",update=True)
+                else:
+                    date.border_subtitle = "Date (Invalid Date)"
+                    date.add_class("invalid",update=True)
+                    return
+                montant_value = abs(float(montant.value)) if choix.id == "r" else float(montant.value)
+                
+                new_transaction = Transaction(montant = montant_value, choix = choix.id, raison = raison_value, year = int(year) if Validation.IsYear(year) else None, month = int(month) if Validation.IsMonth(month) else None, day = int(day) if Validation.IsDay(day) else None)
+                user.add_transaction(new_transaction)
+                self.make_row(new_transaction)
+                self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
+                user.save_info()
+                raison.action_end()
+                raison.action_delete_left_all()
+                montant.action_end()
+                montant.action_delete_left_all()
+                date.action_end()
+                date.action_delete_left_all()
+            else : 
+                montant.border_subtitle = "Montant (Invalid Montant)"
+                montant.add_class("invalid",update=True)
+                
 
             
         else:
@@ -363,19 +390,18 @@ class Login(App):
         raison = self.query_one("#raison", Input)
         raison_value = raison.value if raison.value != "" else None
 
-        year = self.query_one("#year", Input)
+        date = self.query_one("#date", Input)
 
-        month = self.query_one("#month", Input)
+        year, month, day = date.value.split("\\") if date.value != "" else (None, None, None)
 
-        day = self.query_one("#day", Input)
 
         if user is not None:
-            if int(id_transaction.value) <= user.get_last_transaction().get_id() and int(id_transaction.value) >= 0:
-                choix = "d" if int(montant.value) >= 0 else "r"
+            if int(id_transaction.value) <= user.get_last_transaction().get_id() and float(id_transaction.value) >= 0:
+                choix = "d" if float(montant.value) >= 0 else "r"
                 if choix == "r":
                     montant.value = str(abs(float(montant.value)))
-                transaction_to_modify: Transaction = user.get_transactions()[int(id_transaction.value)]
-                transaction_to_modify.change_transaction(new_raison = raison_value, new_montant = montant_value, new_choix = choix, new_year = int(year.value) if Validation.IsYear(year.value) else None, new_month =int(month.value) if Validation.IsMonth(month.value) else None, new_day = int(day.value) if Validation.IsDay(day.value) else None)
+                transaction_to_modify: Transaction = user.get_transactions()[float(id_transaction.value)]
+                transaction_to_modify.change_transaction(new_raison = raison_value, new_montant = montant_value, new_choix = choix, new_year = int(year) if Validation.IsYear(year) else None, new_month =int(month) if Validation.IsMonth(month) else None, new_day = int(day) if Validation.IsDay(day) else None)
                 user.save_info()
                 self.changes_cells(transaction_to_modify)
                 self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
@@ -383,12 +409,9 @@ class Login(App):
                 raison.action_delete_left_all()
                 montant.action_end()
                 montant.action_delete_left_all()
-                year.action_end()
-                year.action_delete_left_all()
-                month.action_end()
-                month.action_delete_left_all()
-                day.action_end()
-                day.action_delete_left_all()
+                date.action_end()
+                date.action_delete_left_all()
+               
                 if(id_transaction.has_class("invalid")):
                     id_transaction = self.query_one('#ID', Input)
                     id_transaction.border_subtitle = "ID"
@@ -398,7 +421,6 @@ class Login(App):
             else:
                 id_transaction.border_subtitle = "ID (Invalid ID)"
                 id_transaction.add_class("invalid",update=True)
-
         else:
          raise ValueError("The user hasn't been set and we are yet on second page")
 
@@ -508,10 +530,48 @@ class Login(App):
     async def on_input_changed(self,event:Input.Changed):
         ##For the date Input:
         input_date = self.query_one("#date",Input)
-        if len(input_date.value) == 4 or len(input_date.value) == 7 :
+        string_date = input_date.value
+        if re.search(r"^\d{4}$",string_date) or re.search(r"^\d{4}\\\d{2}$", string_date) and input_date.value[-1] != "\\":
             input_date.action_end()
             input_date.insert_text_at_cursor("\\")
-            
+
+        ##For dynamique depot and retrait
+        input_montant = self.query_one("#chiffre",Input)
+        if input_montant.value != "":
+            if input_montant.value[0] == "-" and self.query_one("#r",ListItem).display == False:
+                self.query_one("#options", ListView).action_cursor_down()
+        elif self.query_one("#r",ListItem).display == True and input_montant.value == "":
+            self.query_one("#options", ListView).action_cursor_up()
+
+
+        
+
+
+    async def on_list_view_highlighted(self, event: ListView.Highlighted):
+        choice = event.item
+        if choice.id == "m":
+            choice.display = True;
+            self.query_one("#r",ListItem).display = False;
+            self.query_one("#d",ListItem).display = False; 
+
+
+            self.query_one("#ID",Input).display = True
+            self.query_one("#chiffre",Input).styles.max_width = '25%'
+            self.query_one("#raison",Input).styles.max_width = '25%'
+            self.query_one("#date",Input).styles.max_width = '25%'
+        else:
+            if choice.id == "d":
+                choice.display = True;
+                self.query_one("#r",ListItem).display = False;
+                self.query_one("#m",ListItem).display = False;
+            else:
+                choice.display = True;
+                self.query_one("#m",ListItem).display = False;
+                self.query_one("#d",ListItem).display = False;
+            self.query_one("#ID",Input).display = False
+            self.query_one("#chiffre",Input).styles.max_width = '33%'
+            self.query_one("#raison",Input).styles.max_width = '33%'
+            self.query_one("#date",Input).styles.max_width = '33%'
 
 
         
@@ -527,20 +587,7 @@ class Login(App):
             await self.add_transaction()
         elif self.query_one("#ID",Input).display == True and (self.query_one("#chiffre",Input).value != "" or self.query_one("#ID",Input).value != ""):
             await self.modify_transaction()
-
-    def on_radio_set_changed(self, event:RadioSet.Changed):
-        radio_button = event.pressed
-        if radio_button.id == "m":
-            self.query_one("#ID",Input).display = True
-            self.query_one("#chiffre",Input).styles.max_width = '25%'
-            self.query_one("#raison",Input).styles.max_width = '25%'
-            self.query_one("#date",Input).styles.max_widht = '25%'
-        else:
-            self.query_one("#ID",Input).display = False
-            self.query_one("#chiffre",Input).styles.max_width = '33%'
-            self.query_one("#raison",Input).styles.max_width = '33%'
-            self.query_one("#date",Input).styles.max_width = '33%'
-            
+     
 
     def on_button_pressed(self,event:Button.Pressed):
         button_pressed = event.button.id
