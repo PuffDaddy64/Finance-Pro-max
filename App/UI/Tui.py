@@ -326,14 +326,14 @@ class Login(App):
         global user
         montant = self.query_one("#chiffre", Input)
         raison = self.query_one("#raison", Input)
-        year = self.query_one("#year", Input)
-        month = self.query_one("#month", Input)
-        day = self.query_one("#day", Input)
+        date = self.query_one("#date", Input)
         raison_value = raison.value if raison.value != "" else "Aucune raison"
         if user is not None:
             menu = self.query_one("#options", RadioSet)
             choix = menu.pressed_button
-            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value, year = int(year.value) if Validation.IsYear(year.value) else None, month = int(month.value) if Validation.IsMonth(month.value) else None, day = int(day.value) if Validation.IsDay(day.value) else None)
+            splitted_date = date.value.split("\\")
+            year, month, day = splitted_date[0], splitted_date[1], splitted_date[2]
+            new_transaction = Transaction(montant = montant.value, choix = choix.id, raison = raison_value, year = int(year) if Validation.IsYear(year) else None, month = int(month) if Validation.IsMonth(month) else None, day = int(day) if Validation.IsDay(day) else None)
             user.add_transaction(new_transaction)
             self.make_row(new_transaction)
             self.query_one("#solde",Label).update(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}")
@@ -342,12 +342,8 @@ class Login(App):
             raison.action_delete_left_all()
             montant.action_end()
             montant.action_delete_left_all()
-            year.action_end()
-            year.action_delete_left_all()
-            month.action_end()
-            month.action_delete_left_all()
-            day.action_end()
-            day.action_delete_left_all()
+            date.action_end()
+            date.action_delete_left_all()
             
 
             
@@ -527,7 +523,7 @@ class Login(App):
         if input_id == "user" or input_id == "pwd": # Login page
             self.login_page_treatment()
 
-        elif (event.control.id == "chiffre" or event.control.id == "raison" or event.control.id == "ID" or event.control.id == "year" or event.control.id == "month" or event.control.id == "day") and self.query_one("#ID",Input).display == False : # Second page
+        elif (event.control.id == "chiffre" or event.control.id == "raison" or event.control.id == "ID" or event.control.id == "date") and self.query_one("#ID",Input).display == False : # Second page
             await self.add_transaction()
         elif self.query_one("#ID",Input).display == True and (self.query_one("#chiffre",Input).value != "" or self.query_one("#ID",Input).value != ""):
             await self.modify_transaction()

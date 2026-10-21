@@ -112,7 +112,7 @@ class Transaction:
             self.date: datetime.date = datetime.datetime.now().date()
             
         else:
-            self.date: datetime.date = datetime.datetime(year = year, month = month, day = day)
+            self.date: datetime.date = datetime.datetime(year = year, month = month, day = day).date()
 
     def get_date(self) -> datetime.date:
         """
