@@ -16,9 +16,10 @@ import sys
 import time
 import re;
 
-from textual import on
+from textual import on, events
 from textual.app import App,ComposeResult
 from textual.containers import  Container, Horizontal, Vertical
+from textual.events import Key
 from textual.widgets import DataTable, Header, Footer, Button, Input, Label, RadioButton, RadioSet,ListView , ListItem
 from textual.validation import Length,Validator, ValidationResult
 from textual.binding import Binding
@@ -162,7 +163,7 @@ class Login(App):
                             ),
                             Input(
                                 type="number",
-                                id="chiffre"
+                                id="chiffre",
                             ),
                             Input(
                                 type="text",
@@ -171,6 +172,7 @@ class Login(App):
                             Input(
                                 type="text",
                                 validators=[Length(10)],
+                                max_length=10,
                                 id="date",
                                
                             ),
@@ -530,14 +532,17 @@ class Login(App):
 
 ###########################   ON_ Method (Event)   ############################
 
-
-    async def on_input_changed(self,event:Input.Changed):
+    
+    async def on_input_changed(self, event:Input.Changed):
         ##For the date Input:
         input_date = self.query_one("#date",Input)
         string_date = input_date.value
-        if re.search(r"^\d{4}$",string_date) or re.search(r"^\d{4}\\\d{2}$", string_date) and input_date.value[-1] != "\\":
+
+        if re.search(r"^\d{5}$",string_date) or re.search(r"^\d{4}\\\d{3}$", string_date) and input_date.value[-1] != "\\":
             input_date.action_end()
+            input_date.action_cursor_left()
             input_date.insert_text_at_cursor("\\")
+            input_date.action_end()
 
         ##For dynamique depot and retrait
         input_montant = self.query_one("#chiffre",Input)
