@@ -9,7 +9,7 @@
 
 Description : Main Core of the app.
 
-Note: Le fichier possède actuellent deux fonctions de UI, c'est pour isoler le fonctionnement de TUI de SimpleUI. Afin de mener des tests à différents endroits de l'application.
+Note: Fichier de lancement du UI
 
 """
 

@@ -111,114 +111,160 @@ $textcolor: #D2D5CC;
 	
 }
 
-
 #body{
 
     height: 100%;
     width: 100%;
-    
-    #top{
 
-        height: 10%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
+    #tabs{
 
-        #menu{
-           
-            height: 100%;
-            width: 20%;
+        height:10%;
+        width:100%;
+
+    }
+
+    #AddModify{
+
+        height:90%;
+        width:100%;
+        display:none;
+
+        #top{
+
+            height: 10%;
+            width: 100%;
+            margin: 0;
             padding: 0;
-            #options{
-                background: white 0%;
-                
-                padding: 1;
-                content-align: center middle;
-                ListItem{
-                    height: 100%;
-                    width: 100%;
-                    align: center middle;
-                    outline: double $borderColor;
-                    
-                    Label{
-                        color: $textcolor;
-                    }
-                }
 
-                #d{
-                }
-                #r{
+            #menu{
+            
+                height: 100%;
+                width: 20%;
+                padding: 0;
+
+                #options{
+
+                    background: white 0%;
+                    padding: 1;
+                    content-align: center middle;
+
+                    ListItem{
+
+                        height: 100%;
+                        width: 100%;
+                        align: center middle;
+                        outline: double $borderColor;
+                        
+                        Label{
+
+                            color: $textcolor;
+
+                        }
+                    }
+
+                    #d{
+
+                    }
+                    #r{
+                        
+                        display:none;
+
+                    }
+                    #m{
+
+                        display:none;
+
+                    }
                     
-                    display:none;
                 }
-                #m{
-                    display:none;
+            }
+
+            #montant{
+
+                height: 100%;
+                width: 80%;
+                
+                #chiffre{
+
+                    height: 100%;
+                    max-width: 33%;
+
+                }
+                #ID{
+
+                    height: 100%;
+                    width: 25%;
+                    display: none;
+
+                }
+        
+                #raison{
+
+                    height:100%;
+                    max-width: 33%;
+
                 }
                 
+                #date{
+
+                    height:100%;
+                    max-width:33%;
+
+                }
             }
         }
+        
+        #middle{
 
-        #montant{
-            height: 100%;
-            width: 80%;
-            
-            #chiffre{
+            height: 70%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            border-top: panel $borderColor 50%;
+
+            #info{
+
                 height: 100%;
-                max-width: 33%;
+                width: 20%;
+                margin: 1;
 
             }
-            #ID{
+            #table{
+
                 height: 100%;
-                width: 25%;
-                display: none;
+                width: 80%;
+                background: #171A17 100%;
+                border: double $borderColor 60%;
+                tint: #267326 5%;
+
             }
-      
-            #raison{
-                height:100%;
-                max-width: 33%;
+            #table:focus{
+
+                border: double $borderColor 80%;
+
             }
             
-			#date{
-                height:100%;
-                max-width:33%;
+            #left{
+
+                border: $borderColor 62%;   
+
+                #info{
+
+                    width: 100%;
+                    height: auto;
+                    border:  round $ErrorColor  62%;
+                    padding:1;
+                    margin: 1;
+                    align: left top;  
+
+                }
             }
         }
     }
-        
-    #middle{
-        height: 70%;
+
+    #AnalysisPage{
+        height: 90%;
         width: 100%;
-        margin: 0;
-        padding: 0;
-        border-top: panel $borderColor 50%;
-
-        #info{
-            height: 100%;
-            width: 20%;
-            margin: 1;
-        }
-        #table{
-            height: 100%;
-            width: 80%;
-            background: #171A17 100%;
-            border: double $borderColor 60%;
-            tint: #267326 5%;
-        }
-        #table:focus{
-            border: double $borderColor 80%;
-        }
-        
-        #left{
-            border: $borderColor 62%;      
-            #info{
-                width: 100%;
-                height: auto;
-                border:  round $ErrorColor  62%;
-                padding:1;
-                margin: 1;
-                align: left top;              
-            }
-        }
-
+        display:none
     }
 }

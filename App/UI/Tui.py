@@ -9,43 +9,32 @@
 Description : UI handler whic appearsin the terminal. This UI is built with a library called Textual.
 """
 # Imports to use during the creation of UIs with Textual
-import asyncio
 import os
-
 import sys
-import time
-import re;
-
-from textual import on, events
+import re
 from textual.app import App,ComposeResult
 from textual.containers import  Container, Horizontal, Vertical
-from textual.events import Key
-from textual.widgets import DataTable, Header, Footer, Button, Input, Label, RadioButton, RadioSet,ListView , ListItem
-from textual.validation import Length,Validator, ValidationResult
+from textual.widgets import DataTable, Button, Input, Label, ListView , ListItem, Tabs, Tab
+from textual.events import InputEvent
+from textual.validation import Length
 from textual.binding import Binding
 from rich.text import Text
 from typing import ClassVar
-
-
-
-# Import from SimpleUI which is the old UI
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from API.User import User
 from API.Transaction import Transaction
-import time as t
 import API.Fichier as fichier
-import subprocess
-import platform
-from getpass import getpass
 import pickle
 import API.Validation as Validation
-import ast
+
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 # Classes modified for our App
 # Class for a button
 class End(Button):
     """
-    Button class for eventual usages of buttons. NOT IMPLEMENTED!!!
+    Button class for eventual usages of buttons.
     """
     num : int  = 0 
 
@@ -69,7 +58,7 @@ class Login(App):
     try_pwd:int = 3 # 3 tries for the pwd
 
     # Path related to the CSS file wich determines the format appearance of each widget represented in that file
-    CSS_PATH="TCSS/login.tcss"
+    CSS_PATH = "TCSS/login.tcss"
 
 
     BINDINGS: ClassVar[list[Binding]] = [ # type: ignore[override] # Ne pas enlever le commentaire, il retire une erreur relié à un override volontaire de notre part sur BINDINGS
@@ -144,7 +133,18 @@ class Login(App):
         )
 
         yield Container(
-                    
+                Tabs(
+                    Tab(
+                        "Add/Modify transactions",
+                        id = "add"
+                    ),
+                    Tab(
+                        "Analysis",
+                        id = "analysis"
+                    ),
+                    id = "tabs"
+                    ),
+                Container(
                     Horizontal(
                         Container(
                             ListView(
@@ -196,10 +196,15 @@ class Login(App):
                         DataTable(
                             id="table",
                         ),
-                        id="middle",
+                        id="middle"
                     ),
-                    id="body",
-                ) 
+                    id = "AddModify"
+                ),
+                Container(
+                    id = "AnalysisPage"
+                ),
+                id="body",
+            ) 
         self.state = 0
 
 
@@ -482,15 +487,17 @@ class Login(App):
         """
         Method to display the second page of the app
         """
+
         global user
-        
-        
-        self.query_one("#body").display = True
-        self.make_rows(user)
-        labels = self.query_one( "#info")
-        labels.remove_children()
-        labels.mount(Label(user.get_name()))
-        labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
+
+        if user is not None:
+            self.query_one("#body", Container).display = True
+            self.query_one("#AddModify", Container).display = True
+            self.make_rows(user)
+            labels = self.query_one( "#info")
+            labels.remove_children()
+            labels.mount(Label(user.get_name()))
+            labels.mount(Label(f"Solde: {sum(user.get_transactions()[id].get_montant() for id in user.get_transactions())}",id="solde"))
         # Montant 
         inputChiffre = self.query_one('#chiffre', Input) 
         inputChiffre.border_subtitle = "Montant"
@@ -531,8 +538,16 @@ class Login(App):
 
 
 ###########################   ON_ Method (Event)   ############################
+    def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
+        active_tab = event.tab
+        if active_tab.id == "add":
+            self.query_one("#AddModify", Container).display = True
+        elif active_tab.id == "analysis":
+            self.query_one("#AddModify", Container).display = False
+            self.query_one("#AnalysisPage", Container).display = True
+            
 
-    
+
     async def on_input_changed(self, event:Input.Changed):
         ##For the date Input:
         input_date = self.query_one("#date",Input)
@@ -547,40 +562,40 @@ class Login(App):
         ##For dynamique depot and retrait
         input_montant = self.query_one("#chiffre",Input)
         if input_montant.value != "":
-            if input_montant.value[0] == "-" and self.query_one("#r",ListItem).display == False:
+            if input_montant.value[0] == "-" and not self.query_one("#r",ListItem).display:
                 self.query_one("#options", ListView).action_cursor_down()
-        elif self.query_one("#r",ListItem).display == True and input_montant.value == "":
+        elif self.query_one("#r", ListItem).display and input_montant.value != "-":
             self.query_one("#options", ListView).action_cursor_up()
 
 
         
 
-
     async def on_list_view_highlighted(self, event: ListView.Highlighted):
         choice = event.item
-        if choice.id == "m":
-            choice.display = True;
-            self.query_one("#r",ListItem).display = False;
-            self.query_one("#d",ListItem).display = False; 
-
-
-            self.query_one("#ID",Input).display = True
-            self.query_one("#chiffre",Input).styles.max_width = '25%'
-            self.query_one("#raison",Input).styles.max_width = '25%'
-            self.query_one("#date",Input).styles.max_width = '25%'
-        else:
-            if choice.id == "d":
-                choice.display = True;
-                self.query_one("#r",ListItem).display = False;
-                self.query_one("#m",ListItem).display = False;
-            else:
-                choice.display = True;
-                self.query_one("#m",ListItem).display = False;
+        if choice is not None:
+            if choice.id == "m":
+                choice.display = True
+                self.query_one("#r",ListItem).display = False
                 self.query_one("#d",ListItem).display = False;
-            self.query_one("#ID",Input).display = False
-            self.query_one("#chiffre",Input).styles.max_width = '33%'
-            self.query_one("#raison",Input).styles.max_width = '33%'
-            self.query_one("#date",Input).styles.max_width = '33%'
+
+
+                self.query_one("#ID",Input).display = True
+                self.query_one("#chiffre",Input).styles.max_width = '25%'
+                self.query_one("#raison",Input).styles.max_width = '25%'
+                self.query_one("#date",Input).styles.max_width = '25%'
+            else:
+                if choice.id == "d":
+                    choice.display = True
+                    self.query_one("#r",ListItem).display = False
+                    self.query_one("#m",ListItem).display = False
+                else:
+                    choice.display = True
+                    self.query_one("#m",ListItem).display = False
+                    self.query_one("#d",ListItem).display = False
+                self.query_one("#ID",Input).display = False
+                self.query_one("#chiffre",Input).styles.max_width = '33%'
+                self.query_one("#raison",Input).styles.max_width = '33%'
+                self.query_one("#date",Input).styles.max_width = '33%'
 
 
         
